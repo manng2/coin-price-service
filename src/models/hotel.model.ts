@@ -1,9 +1,18 @@
-type ImageModel = "rooms" | "site" | "amenities";
+export enum ImageTypeModel {
+  ROOM = "rooms",
+  FACILITY = "facility",
+}
 
 export enum FacilitiesTypeModel {
   GENERAL = 'general',
   ROOM = 'room'
 }
+
+export interface ImageModel {
+  link: string;
+  description: string;
+}
+
 // export type FacilitiesNameModel = "pool" | "wifi" | 'airCon' | 'bathTub' | 'breakfast' | 'bar' | 'dryCleaning' | 'businessCenter' | 'kettle' | 'tv' | 'hairDryer';
 export enum FacilitiesNameModel {
   POOL = "pool",
@@ -29,13 +38,10 @@ export interface FlattenHotelModel {
   city: string;
   country: string;
   description: string;
-  amenities: Record<FacilitiesTypeModel, Record<FacilitiesNameModel, boolean>>;
+  amenities: Record<FacilitiesTypeModel, FacilitiesNameModel[]>;
   images: Record<
-    ImageModel,
-    ReadonlyArray<{
-      link: string;
-      description: string;
-    }>
+    ImageTypeModel,
+    ReadonlyArray<ImageModel>
   >;
   bookingConditions: ReadonlyArray<string>;
 }
