@@ -26,6 +26,8 @@ import {
   UncleanedImagesModel,
 } from "../models/uncleaned-hotel-data.model";
 import { generateDataMappingFromDictionary } from "../utils";
+import { HotelQueryModel } from "../models/hotel.query.model";
+import { GetOptionModel } from "../models/get-option.model";
 
 // TODO: Remove Any
 
@@ -248,6 +250,29 @@ function mergingData(data: HotelDataBySupplierModel[]): HotelDataBySupplierModel
   return Object.values(result);
 }
 
+function filterHotelDataByQuery(data: UncleanedHotelDataModel[], query?: HotelQueryModel): UncleanedHotelDataModel[] {
+  const { hotels, destination } = query || {};
+
+  return data.filter((it) => {
+    let isFilteredByHotel = false;
+    let isFilteredByDestination = false;
+
+    if (hotels && hotels.length) {
+      const idKeys = HOTEL_DATA_KEY_DICTIONARY.id;
+
+      isFilteredByHotel = idKeys.some((key) => (key in it && hotels.includes(it[key as keyof UncleanedHotelDataModel] as string)))
+    }
+
+    if (destination) {
+      const idKeys = HOTEL_DATA_KEY_DICTIONARY.destinationId;
+
+      isFilteredByDestination = idKeys.some((key) => (key in it && it[key as keyof UncleanedHotelDataModel] === destination));
+    }
+
+    return !isFilteredByDestination && !isFilteredByHotel;
+  });
+}
+
 async function getAllSuppliers(): Promise<string[]> {
   return new Promise((resolve) =>
     resolve([
@@ -260,9 +285,8 @@ async function getAllSuppliers(): Promise<string[]> {
 
 async function getHotelDataBySuppliers(
   suppliers: string[],
-  options?: {
-    batch: number;
-  }
+  query?: HotelQueryModel,
+  options?: GetOptionModel
 ): Promise<HotelDataBySupplierModel[]> {
   return new Promise(async (resolve, reject) => {
     const { batch } = options || defaultGetOption;
@@ -283,7 +307,9 @@ async function getHotelDataBySuppliers(
         );
 
         data.forEach((it) => {
-          it.forEach((d) => result.push(cleaningData(d)));
+          filterHotelDataByQuery(it, query).forEach((d) => {
+            result.push(cleaningData(d));
+          });
         });
 
         size -= batch;

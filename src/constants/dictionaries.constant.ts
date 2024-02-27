@@ -22,7 +22,7 @@ export const AMENITY_NAME_DICTIONARY: Record<AmenitiesNameModel, string[]> = {
   [AmenitiesNameModel.AIR_CON]: ["Air Conditioner", "Air conditioner"],
   [AmenitiesNameModel.BATHTUB]: ["Bath Tub", "BathTub", "bathtub"],
   [AmenitiesNameModel.BREAKFAST]: ["Breakfast", "breakfast"],
-  [AmenitiesNameModel.BAR]: ["Bar", "minibar"],
+  [AmenitiesNameModel.BAR]: ["Bar", "minibar", "bar"],
   [AmenitiesNameModel.DRY_CLEANING]: [
     "DryCleaning",
     "dry cleaning",
