@@ -2,14 +2,15 @@ import { defaultGetOption } from "../constants";
 import {
   FacilitiesNameModel,
   FacilitiesTypeModel,
-  FlattenHotelModel,
+  HotelModel,
   ImageModel,
   ImageTypeModel,
 } from "../models/hotel.model";
+import { UncleanedAmenitiesModel, UncleanedHotelDataModel, UncleanedImageModel, UncleanedImagesModel } from "../models/uncleaned-hotel-data.model";
 
-// TODO: Remove any
+// TODO: Remove Any
 
-const HOTEL_DATA_KEY_DICTIONARY: Record<keyof FlattenHotelModel, string[]> = {
+const HOTEL_DATA_KEY_DICTIONARY: Record<keyof HotelModel, string[]> = {
   id: ["Id", "id", "hotel_id"],
   destinationId: ["DestinationId", "destination", "destination_id"],
   name: ["Name", "name", "hotel_name"],
@@ -91,7 +92,7 @@ function generateDataMappingFromDictionary<T>(
   return result;
 }
 
-const fieldMapping = generateDataMappingFromDictionary<keyof FlattenHotelModel>(
+const fieldMapping = generateDataMappingFromDictionary<keyof HotelModel>(
   HOTEL_DATA_KEY_DICTIONARY
 );
 const facilitiesNameMapping =
@@ -113,15 +114,15 @@ const imageDataKeyMapping = generateDataMappingFromDictionary<keyof ImageModel>(
   IMAGE_DATA_KEY_DICTIONARY
 );
 
-function getValueByKey<T>(value: any, key: string): T {
+function getValueByKey(value: UncleanedHotelDataModel, key: string): null | Object {
   const keys = key.split(".");
   let res = value;
 
   for (const k of keys) {
     if (res && typeof res === "object" && k in res) {
-      res = res[k];
+      res = res[k as keyof UncleanedHotelDataModel] as any;
     } else {
-      return {} as T;
+      return null;
     }
   }
 
@@ -129,16 +130,16 @@ function getValueByKey<T>(value: any, key: string): T {
 }
 
 function mappingObjectData(
-  data: any,
+  data: UncleanedHotelDataModel,
   key: string,
-  newKey: keyof FlattenHotelModel
-): any {
+  newKey: keyof HotelModel
+): Object {
   switch (newKey) {
     case "amenities": {
-      return mappingAmenitiesData(data[key]);
+      return mappingAmenitiesData(data[key as keyof UncleanedHotelDataModel] as UncleanedAmenitiesModel);
     }
     case "images": {
-      return mappingImagesData(data[key]);
+      return mappingImagesData(data[key as keyof UncleanedHotelDataModel] as UncleanedImagesModel);
     }
     default: {
       return {};
@@ -147,7 +148,7 @@ function mappingObjectData(
 }
 
 function mappingAmenitiesData(
-  amenities: ReadonlyArray<string> | Record<string, ReadonlyArray<string>>
+  amenities: UncleanedAmenitiesModel
 ): Record<FacilitiesTypeModel, FacilitiesNameModel[]> {
   if (!amenities) {
     return {
@@ -189,7 +190,7 @@ function mappingAmenitiesData(
 }
 
 function mappingImagesData(
-  images: Record<string, ReadonlyArray<Object>>
+  images: UncleanedImagesModel
 ): Record<ImageTypeModel, ReadonlyArray<ImageModel>> {
   if (!images) {
     return {
@@ -206,11 +207,11 @@ function mappingImagesData(
   Object.entries(images).forEach(([type, data]) => {
     const newType = imageTypeMapping.get(type);
     if (newType) {
-      result[newType] = data.map((it: any) =>
+      result[newType] = data.map((it: UncleanedImageModel) =>
         Object.keys(it).reduce((res, key) => {
           const newKey = imageDataKeyMapping.get(key);
           if (newKey) {
-            res[newKey] = it[key];
+            res[newKey] = it[key as keyof UncleanedImageModel];
           }
           return res;
         }, {} as ImageModel)
@@ -221,22 +222,24 @@ function mappingImagesData(
   return result;
 }
 
-function mappingData(data: any): FlattenHotelModel {
-  return Object.keys(data).reduce((res, key) => {
+function mappingData(data: UncleanedHotelDataModel): HotelModel {
+  const result: Partial<HotelModel> = {};
+
+  Object.keys(data).forEach((key) => {
     const newKey = fieldMapping.get(key);
 
-    if (newKey) {
-      const mappedData = getValueByKey(data, key) as never;
+    if (newKey && newKey in result) {
+      const mappedData = getValueByKey(data, key);
 
-      if (typeof mappedData === "object") {
-        res[newKey] = mappingObjectData(data, key, newKey) as never;
+      if (mappedData && typeof mappedData === "object") {
+        result[newKey] = mappingObjectData(data, key, newKey) as any;
       } else {
-        res[newKey] = mappedData;
+        result[newKey] = mappedData as any;
       }
     }
+  })
 
-    return res;
-  }, {} as FlattenHotelModel);
+  return result as HotelModel;
 }
 
 async function getAllSuppliers(): Promise<string[]> {
@@ -248,15 +251,15 @@ async function getHotelDataBySuppliers(
   options?: {
     batch: number;
   }
-): Promise<any> {
+): Promise<HotelModel[]> {
   return new Promise(async (resolve, reject) => {
     const { batch } = options || defaultGetOption;
-    const result: FlattenHotelModel[] = [];
+    const result: HotelModel[] = [];
     let size = suppliers.length;
     let start = 0;
 
     while (size > 0) {
-      const data = await Promise.all(
+      const data: UncleanedHotelDataModel[][] = await Promise.all(
         suppliers
           .slice(start, start + batch)
           .map((supplier) =>
@@ -267,7 +270,7 @@ async function getHotelDataBySuppliers(
       );
 
       data.forEach((it) => {
-        it.forEach((d: any) => result.push(mappingData(d)));
+        it.forEach((d) => result.push(mappingData(d)));
       });
 
       size -= batch;

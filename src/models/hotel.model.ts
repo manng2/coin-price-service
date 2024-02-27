@@ -28,7 +28,7 @@ export enum FacilitiesNameModel {
   HAIRDRYER = "hairDryer",
 }
 
-export interface FlattenHotelModel {
+export interface HotelModel {
   id: string;
   destinationId: number;
   name: string;
