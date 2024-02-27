@@ -1,4 +1,7 @@
 import { defaultGetOption } from "../constants";
+import { defaultAmenities, defaultImages } from "../constants/default-data.constant";
+import { HOTEL_DATA_KEY_DICTIONARY, FACILITY_NAME_DICTIONARY, FACILITY_TYPE_DICTIONARY, IMAGE_TYPE_DICTIONARY, IMAGE_DATA_KEY_DICTIONARY, FACILITY_TYPE_TO_FACILITY_NAME_DICTIONARY } from "../constants/dictionaries.constant";
+import { Nullable } from "../models/core.model";
 import {
   FacilitiesNameModel,
   FacilitiesTypeModel,
@@ -7,92 +10,11 @@ import {
   ImageTypeModel,
 } from "../models/hotel.model";
 import { UncleanedAmenitiesModel, UncleanedHotelDataModel, UncleanedImageModel, UncleanedImagesModel } from "../models/uncleaned-hotel-data.model";
+import { generateDataMappingFromDictionary } from "../utils";
 
 // TODO: Remove Any
 
-const HOTEL_DATA_KEY_DICTIONARY: Record<keyof HotelModel, string[]> = {
-  id: ["Id", "id", "hotel_id"],
-  destinationId: ["DestinationId", "destination", "destination_id"],
-  name: ["Name", "name", "hotel_name"],
-  lat: ["Latitude", "lat"],
-  lng: ["Longitude", "lng"],
-  address: ["Address", "address", "location.address"],
-  city: ["City"],
-  country: ["Country", "location.country"],
-  description: ["Description", "info", "details"],
-  amenities: ["Facilities", "amenities"],
-  images: ["images"],
-  bookingConditions: ["booking_conditions"],
-};
-
-const FACILITY_NAME_DICTIONARY: Record<FacilitiesNameModel, string[]> = {
-  [FacilitiesNameModel.POOL]: ["Pool"],
-  [FacilitiesNameModel.WIFI]: ["WiFi", "Wifi"],
-  [FacilitiesNameModel.AIR_CON]: ["Air Conditioner", "Air conditioner"],
-  [FacilitiesNameModel.BATHTUB]: ["Bath Tub", "BathTub"],
-  [FacilitiesNameModel.BREAKFAST]: ["Breakfast", "breakfast"],
-  [FacilitiesNameModel.BAR]: ["Bar"],
-  [FacilitiesNameModel.DRY_CLEANING]: [
-    "DryCleaning",
-    "dry cleaning",
-    "dryCleaning",
-  ],
-  [FacilitiesNameModel.BUSINESS_CENTER]: ["BusinessCenter", "Business Center"],
-  [FacilitiesNameModel.KETTLE]: ["kettle", "Kettle"],
-  [FacilitiesNameModel.TV]: ["tv", "TV"],
-  [FacilitiesNameModel.HAIRDRYER]: ["hairDryer", "hairDryer"],
-};
-
-const FACILITY_TYPE_DICTIONARY: Record<FacilitiesTypeModel, string[]> = {
-  [FacilitiesTypeModel.GENERAL]: ["general", "General", "Other"],
-  [FacilitiesTypeModel.ROOM]: ["room", "Room"],
-};
-
-const FACILITY_TYPE_TO_FACILITY_NAME_DICTIONARY: Record<
-  FacilitiesTypeModel,
-  FacilitiesNameModel[]
-> = {
-  [FacilitiesTypeModel.GENERAL]: [
-    FacilitiesNameModel.BAR,
-    FacilitiesNameModel.BREAKFAST,
-    FacilitiesNameModel.BUSINESS_CENTER,
-    FacilitiesNameModel.POOL,
-  ],
-  [FacilitiesTypeModel.ROOM]: [
-    FacilitiesNameModel.WIFI,
-    FacilitiesNameModel.BATHTUB,
-    FacilitiesNameModel.BREAKFAST,
-    FacilitiesNameModel.KETTLE,
-    FacilitiesNameModel.TV,
-    FacilitiesNameModel.HAIRDRYER,
-    FacilitiesNameModel.AIR_CON,
-  ],
-};
-
-const IMAGE_TYPE_DICTIONARY: Record<ImageTypeModel, string[]> = {
-  [ImageTypeModel.ROOM]: ["rooms", "Rooms"],
-  [ImageTypeModel.FACILITY]: ["site", "amenities"],
-};
-
-const IMAGE_DATA_KEY_DICTIONARY: Record<keyof ImageModel, string[]> = {
-  description: ["description", "caption"],
-  link: ["link", "url"],
-};
-
-function generateDataMappingFromDictionary<T>(
-  dictionary: Record<string, string[]>
-): Map<string, T> {
-  const result = new Map<string, T>();
-
-  Object.entries(dictionary).forEach((pair) => {
-    const [key, dirtyKeys] = pair;
-    dirtyKeys.forEach((it) => result.set(it, key as T));
-  });
-
-  return result;
-}
-
-const fieldMapping = generateDataMappingFromDictionary<keyof HotelModel>(
+const hotelFieldMapping = generateDataMappingFromDictionary<keyof HotelModel>(
   HOTEL_DATA_KEY_DICTIONARY
 );
 const facilitiesNameMapping =
@@ -110,7 +32,7 @@ const facilitiesNameToTypeMapping =
 const imageTypeMapping = generateDataMappingFromDictionary<ImageTypeModel>(
   IMAGE_TYPE_DICTIONARY
 );
-const imageDataKeyMapping = generateDataMappingFromDictionary<keyof ImageModel>(
+const imageFieldMapping = generateDataMappingFromDictionary<keyof ImageModel>(
   IMAGE_DATA_KEY_DICTIONARY
 );
 
@@ -129,20 +51,20 @@ function getValueByKey(value: UncleanedHotelDataModel, key: string): null | Obje
   return res;
 }
 
-function mappingObjectData(
+function mappingData(
   data: UncleanedHotelDataModel,
-  key: string,
+  key: keyof UncleanedHotelDataModel,
   newKey: keyof HotelModel
-): Object {
+): Nullable<Object> {
   switch (newKey) {
     case "amenities": {
-      return mappingAmenitiesData(data[key as keyof UncleanedHotelDataModel] as UncleanedAmenitiesModel);
+      return mappingAmenitiesData(data[key] as UncleanedAmenitiesModel);
     }
     case "images": {
-      return mappingImagesData(data[key as keyof UncleanedHotelDataModel] as UncleanedImagesModel);
+      return mappingImagesData(data[key] as UncleanedImagesModel);
     }
     default: {
-      return {};
+      return getValueByKey(data, key);
     }
   }
 }
@@ -163,11 +85,11 @@ function mappingAmenitiesData(
   };
 
   if (Array.isArray(amenities)) {
-    amenities.forEach((amenity) => {
+    (amenities as ReadonlyArray<string>).forEach((amenity) => {
       const parsedAmenityName = facilitiesNameMapping.get(
-        amenity
+        amenity.trim().toLowerCase()
       ) as FacilitiesNameModel;
-      const type = facilitiesNameToTypeMapping.get(amenity);
+      const type = facilitiesNameToTypeMapping.get(parsedAmenityName);
 
       if (type && parsedAmenityName && result[type]) {
         result[type].push(parsedAmenityName);
@@ -179,7 +101,7 @@ function mappingAmenitiesData(
         const newType = facilitiesTypeMapping.get(type);
         if (newType) {
           result[newType] = data
-            .map((amenity: string) => facilitiesNameMapping.get(amenity))
+            .map((amenity: string) => facilitiesNameMapping.get(amenity.trim().toLowerCase()))
             .filter(Boolean) as FacilitiesNameModel[];
         }
       }
@@ -209,7 +131,7 @@ function mappingImagesData(
     if (newType) {
       result[newType] = data.map((it: UncleanedImageModel) =>
         Object.keys(it).reduce((res, key) => {
-          const newKey = imageDataKeyMapping.get(key);
+          const newKey = imageFieldMapping.get(key);
           if (newKey) {
             res[newKey] = it[key as keyof UncleanedImageModel];
           }
@@ -222,24 +144,73 @@ function mappingImagesData(
   return result;
 }
 
-function mappingData(data: UncleanedHotelDataModel): HotelModel {
+function cleaningData(data: UncleanedHotelDataModel): HotelModel {
   const result: Partial<HotelModel> = {};
 
   Object.keys(data).forEach((key) => {
-    const newKey = fieldMapping.get(key);
+    const newKey = hotelFieldMapping.get(key);
 
-    if (newKey && newKey in result) {
-      const mappedData = getValueByKey(data, key);
-
-      if (mappedData && typeof mappedData === "object") {
-        result[newKey] = mappingObjectData(data, key, newKey) as any;
-      } else {
-        result[newKey] = mappedData as any;
-      }
+    if (newKey) {
+      result[newKey] = mappingData(data, key as keyof UncleanedHotelDataModel, newKey) as any;
     }
   })
 
   return result as HotelModel;
+}
+
+function combineAmenitiesData(first: Record<FacilitiesTypeModel, FacilitiesNameModel[]>, second: Record<FacilitiesTypeModel, FacilitiesNameModel[]>): Record<FacilitiesTypeModel, FacilitiesNameModel[]> {
+  const generalMap: Partial<Record<FacilitiesNameModel, boolean>> = {};
+  const roomMap: Partial<Record<FacilitiesNameModel, boolean>> = {};
+
+  first.general.forEach((it) => generalMap[it] = true);
+  second.general.forEach((it) => generalMap[it] = true);
+  first.room.forEach((it) => roomMap[it] = true);
+  second.room.forEach((it) => roomMap[it] = true);
+
+  return {
+    general: Object.keys(generalMap) as FacilitiesNameModel[],
+    room: Object.keys(roomMap) as FacilitiesNameModel[],
+  };
+}
+
+function combineImagesData(first: Record<ImageTypeModel, ReadonlyArray<ImageModel>>, second: Record<ImageTypeModel, ReadonlyArray<ImageModel>>): Record<ImageTypeModel, ReadonlyArray<ImageModel>> {
+  const roomImages: ImageModel[] = [];
+  const facilityImages: ImageModel[] = [];
+
+  first.rooms.forEach((it) => roomImages.push(it));
+  second.rooms.forEach((it) => roomImages.push(it));
+  first.facility.forEach((it) => facilityImages.push(it));
+  second.facility.forEach((it) => facilityImages.push(it));
+
+  return {
+    [ImageTypeModel.ROOM]: roomImages,
+    [ImageTypeModel.FACILITY]: facilityImages,
+  };
+}
+
+function combineHotelData(first: HotelModel, second: HotelModel): HotelModel {
+  console.log(first, second)
+  return {
+    ...first,
+    ...second,
+    amenities: combineAmenitiesData(first.amenities || defaultAmenities, second.amenities || defaultAmenities),
+    images: combineImagesData(first.images || defaultImages, second.images || defaultImages)
+  };
+}
+
+function mergingData(data: HotelModel[]): HotelModel[] {
+  const result: Record<string, HotelModel> = {};
+
+  data.forEach((it) => {
+    const id = it.id;
+    if (id in result) {
+      result[id] = combineHotelData(result[id], it);
+    } else {
+      result[id] = it;
+    }
+  });
+
+  return Object.values(result);
 }
 
 async function getAllSuppliers(): Promise<string[]> {
@@ -270,14 +241,14 @@ async function getHotelDataBySuppliers(
       );
 
       data.forEach((it) => {
-        it.forEach((d) => result.push(mappingData(d)));
+        it.forEach((d) => result.push(cleaningData(d)));
       });
 
       size -= batch;
       start += batch;
     }
 
-    resolve(result);
+    resolve(mergingData(result));
   });
 }
 

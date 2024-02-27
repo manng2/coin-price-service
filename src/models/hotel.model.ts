@@ -13,7 +13,6 @@ export interface ImageModel {
   description: string;
 }
 
-// export type FacilitiesNameModel = "pool" | "wifi" | 'airCon' | 'bathTub' | 'breakfast' | 'bar' | 'dryCleaning' | 'businessCenter' | 'kettle' | 'tv' | 'hairDryer';
 export enum FacilitiesNameModel {
   POOL = "pool",
   WIFI = "wifi",
@@ -26,6 +25,11 @@ export enum FacilitiesNameModel {
   KETTLE = "kettle",
   TV = "tv",
   HAIRDRYER = "hairDryer",
+  OUTDOOR_POOL = "outdoorPool",
+  INDOOR_POOL = "indoorPool",
+  CHILDCARE = "childcare",
+  COFFEE_MACHINE = "coffeeMachine",
+  IRON = "iron",
 }
 
 export interface HotelModel {
@@ -38,8 +42,8 @@ export interface HotelModel {
   city: string;
   country: string;
   description: string;
-  amenities: Record<FacilitiesTypeModel, FacilitiesNameModel[]>;
-  images: Record<
+  amenities?: Record<FacilitiesTypeModel, FacilitiesNameModel[]>;
+  images?: Record<
     ImageTypeModel,
     ReadonlyArray<ImageModel>
   >;
