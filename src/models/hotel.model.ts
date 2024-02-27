@@ -1,9 +1,9 @@
 export enum ImageTypeModel {
   ROOM = "rooms",
-  FACILITY = "facility",
+  AMENITY = "amenity",
 }
 
-export enum FacilitiesTypeModel {
+export enum AmenitiesTypeModel {
   GENERAL = 'general',
   ROOM = 'room'
 }
@@ -13,7 +13,7 @@ export interface ImageModel {
   description: string;
 }
 
-export enum FacilitiesNameModel {
+export enum AmenitiesNameModel {
   POOL = "pool",
   WIFI = "wifi",
   AIR_CON = "airCon",
@@ -36,39 +36,15 @@ export interface HotelModel {
   id: string;
   destinationId: number;
   name: string;
-  lat: number;
-  lng: number;
-  address: string;
-  city: string;
-  country: string;
+  location: {
+    lat: number;
+    lng: number;
+    address: string;
+    city: string;
+    country: string;
+  };
   description: string;
-  amenities?: Record<FacilitiesTypeModel, FacilitiesNameModel[]>;
-  images?: Record<
-    ImageTypeModel,
-    ReadonlyArray<ImageModel>
-  >;
+  amenities: Record<AmenitiesTypeModel, AmenitiesNameModel[]>;
+  images: Record<ImageTypeModel, ReadonlyArray<ImageModel>>;
   bookingConditions: ReadonlyArray<string>;
 }
-
-// export interface HotelModel {
-//   id: string;
-//   destinationId: number;
-//   name: string;
-//   location: {
-//     lat: number;
-//     lng: number;
-//     address: string;
-//     city: string;
-//     country: string;
-//   };
-//   description: string;
-//   amenities: Record<AmenityModel, ReadonlyArray<string>>;
-//   images: Record<
-//     ImageModel,
-//     ReadonlyArray<{
-//       link: string;
-//       description: string;
-//     }>
-//   >;
-//   bookingConditions: ReadonlyArray<string>;
-// }

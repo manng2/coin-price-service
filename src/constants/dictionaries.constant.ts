@@ -1,6 +1,7 @@
-import { FacilitiesNameModel, FacilitiesTypeModel, HotelModel, ImageModel, ImageTypeModel } from "../models/hotel.model";
+import { HotelDataBySupplierModel } from "../models";
+import { AmenitiesNameModel, AmenitiesTypeModel, HotelModel, ImageModel, ImageTypeModel } from "../models/hotel.model";
 
-export const HOTEL_DATA_KEY_DICTIONARY: Record<keyof HotelModel, string[]> = {
+export const HOTEL_DATA_KEY_DICTIONARY: Record<keyof HotelDataBySupplierModel, string[]> = {
   id: ["Id", "id", "hotel_id"],
   destinationId: ["DestinationId", "destination", "destination_id"],
   name: ["Name", "name", "hotel_name"],
@@ -15,68 +16,68 @@ export const HOTEL_DATA_KEY_DICTIONARY: Record<keyof HotelModel, string[]> = {
   bookingConditions: ["booking_conditions"],
 };
 
-export const FACILITY_NAME_DICTIONARY: Record<FacilitiesNameModel, string[]> = {
-  [FacilitiesNameModel.POOL]: ["Pool"],
-  [FacilitiesNameModel.WIFI]: ["WiFi", "Wifi", "wifi"],
-  [FacilitiesNameModel.AIR_CON]: ["Air Conditioner", "Air conditioner"],
-  [FacilitiesNameModel.BATHTUB]: ["Bath Tub", "BathTub", "bathtub"],
-  [FacilitiesNameModel.BREAKFAST]: ["Breakfast", "breakfast"],
-  [FacilitiesNameModel.BAR]: ["Bar", "minibar"],
-  [FacilitiesNameModel.DRY_CLEANING]: [
+export const AMENITY_NAME_DICTIONARY: Record<AmenitiesNameModel, string[]> = {
+  [AmenitiesNameModel.POOL]: ["Pool"],
+  [AmenitiesNameModel.WIFI]: ["WiFi", "Wifi", "wifi"],
+  [AmenitiesNameModel.AIR_CON]: ["Air Conditioner", "Air conditioner"],
+  [AmenitiesNameModel.BATHTUB]: ["Bath Tub", "BathTub", "bathtub"],
+  [AmenitiesNameModel.BREAKFAST]: ["Breakfast", "breakfast"],
+  [AmenitiesNameModel.BAR]: ["Bar", "minibar"],
+  [AmenitiesNameModel.DRY_CLEANING]: [
     "DryCleaning",
     "dry cleaning",
     "dryCleaning",
   ],
-  [FacilitiesNameModel.BUSINESS_CENTER]: [
+  [AmenitiesNameModel.BUSINESS_CENTER]: [
     "BusinessCenter",
     "Business Center",
     "business center",
   ],
-  [FacilitiesNameModel.KETTLE]: ["kettle", "Kettle"],
-  [FacilitiesNameModel.TV]: ["tv", "TV"],
-  [FacilitiesNameModel.HAIRDRYER]: ["hairDryer", "hairDryer", "hair dryer"],
-  [FacilitiesNameModel.IRON]: ["iron", "Iron"],
-  [FacilitiesNameModel.COFFEE_MACHINE]: ["coffeeMachine", "coffee machine"],
-  [FacilitiesNameModel.CHILDCARE]: ["childcare", "ChildCare"],
-  [FacilitiesNameModel.OUTDOOR_POOL]: ["outdoor pool", "OutdoorPool"],
-  [FacilitiesNameModel.INDOOR_POOL]: ["indoor pool", "IndoorPool"],
+  [AmenitiesNameModel.KETTLE]: ["kettle", "Kettle"],
+  [AmenitiesNameModel.TV]: ["tv", "TV"],
+  [AmenitiesNameModel.HAIRDRYER]: ["hairDryer", "hairDryer", "hair dryer"],
+  [AmenitiesNameModel.IRON]: ["iron", "Iron"],
+  [AmenitiesNameModel.COFFEE_MACHINE]: ["coffeeMachine", "coffee machine"],
+  [AmenitiesNameModel.CHILDCARE]: ["childcare", "ChildCare"],
+  [AmenitiesNameModel.OUTDOOR_POOL]: ["outdoor pool", "OutdoorPool"],
+  [AmenitiesNameModel.INDOOR_POOL]: ["indoor pool", "IndoorPool"],
 };
 
-export const FACILITY_TYPE_DICTIONARY: Record<FacilitiesTypeModel, string[]> = {
-  [FacilitiesTypeModel.GENERAL]: ["general", "General", "Other"],
-  [FacilitiesTypeModel.ROOM]: ["room", "Room"],
+export const AMENITY_TYPE_DICTIONARY: Record<AmenitiesTypeModel, string[]> = {
+  [AmenitiesTypeModel.GENERAL]: ["general", "General", "Other"],
+  [AmenitiesTypeModel.ROOM]: ["room", "Room"],
 };
 
-export const FACILITY_TYPE_TO_FACILITY_NAME_DICTIONARY: Record<
-  FacilitiesTypeModel,
-  FacilitiesNameModel[]
+export const AMENITY_TYPE_TO_AMENITY_NAME_DICTIONARY: Record<
+  AmenitiesTypeModel,
+  AmenitiesNameModel[]
 > = {
-  [FacilitiesTypeModel.GENERAL]: [
-    FacilitiesNameModel.BAR,
-    FacilitiesNameModel.BREAKFAST,
-    FacilitiesNameModel.BUSINESS_CENTER,
-    FacilitiesNameModel.POOL,
-    FacilitiesNameModel.COFFEE_MACHINE,
-    FacilitiesNameModel.CHILDCARE,
-    FacilitiesNameModel.OUTDOOR_POOL,
-    FacilitiesNameModel.INDOOR_POOL,
+  [AmenitiesTypeModel.GENERAL]: [
+    AmenitiesNameModel.BAR,
+    AmenitiesNameModel.BREAKFAST,
+    AmenitiesNameModel.BUSINESS_CENTER,
+    AmenitiesNameModel.POOL,
+    AmenitiesNameModel.COFFEE_MACHINE,
+    AmenitiesNameModel.CHILDCARE,
+    AmenitiesNameModel.OUTDOOR_POOL,
+    AmenitiesNameModel.INDOOR_POOL,
   ],
-  [FacilitiesTypeModel.ROOM]: [
-    FacilitiesNameModel.WIFI,
-    FacilitiesNameModel.BATHTUB,
-    FacilitiesNameModel.BREAKFAST,
-    FacilitiesNameModel.KETTLE,
-    FacilitiesNameModel.TV,
-    FacilitiesNameModel.HAIRDRYER,
-    FacilitiesNameModel.AIR_CON,
-    FacilitiesNameModel.DRY_CLEANING,
-    FacilitiesNameModel.IRON,
+  [AmenitiesTypeModel.ROOM]: [
+    AmenitiesNameModel.WIFI,
+    AmenitiesNameModel.BATHTUB,
+    AmenitiesNameModel.BREAKFAST,
+    AmenitiesNameModel.KETTLE,
+    AmenitiesNameModel.TV,
+    AmenitiesNameModel.HAIRDRYER,
+    AmenitiesNameModel.AIR_CON,
+    AmenitiesNameModel.DRY_CLEANING,
+    AmenitiesNameModel.IRON,
   ],
 };
 
 export const IMAGE_TYPE_DICTIONARY: Record<ImageTypeModel, string[]> = {
   [ImageTypeModel.ROOM]: ["rooms", "Rooms"],
-  [ImageTypeModel.FACILITY]: ["site", "amenities"],
+  [ImageTypeModel.AMENITY]: ["site", "amenities"],
 };
 
 export const IMAGE_DATA_KEY_DICTIONARY: Record<keyof ImageModel, string[]> = {
