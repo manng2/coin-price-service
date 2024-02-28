@@ -1,6 +1,4 @@
-export function generateDataMappingFromDictionary<T>(
-  dictionary: Record<string, string[]>
-): Map<string, T> {
+export function generateDataMappingFromDictionary<T>(dictionary: Record<string, string[]>): Map<string, T> {
   const result = new Map<string, T>();
 
   Object.entries(dictionary).forEach((pair) => {

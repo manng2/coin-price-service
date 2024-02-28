@@ -1,8 +1,5 @@
-import { defaultGetOption } from "../constants";
-import {
-  defaultAmenities,
-  defaultImages,
-} from "../constants/default-data.constant";
+import { defaultGetOption } from '../constants';
+import { defaultAmenities, defaultImages } from '../constants/default-data.constant';
 import {
   HOTEL_DATA_KEY_DICTIONARY,
   AMENITY_NAME_DICTIONARY,
@@ -10,59 +7,30 @@ import {
   IMAGE_TYPE_DICTIONARY,
   IMAGE_DATA_KEY_DICTIONARY,
   AMENITY_TYPE_TO_AMENITY_NAME_DICTIONARY,
-} from "../constants/dictionaries.constant";
-import { Nullable } from "../models/core.model";
-import {
-  AmenitiesNameModel,
-  AmenitiesTypeModel,
-  HotelDataBySupplierModel,
-  ImageModel,
-  ImageTypeModel,
-} from "../models";
-import {
-  UncleanedAmenitiesModel,
-  UncleanedHotelDataModel,
-  UncleanedImageModel,
-  UncleanedImagesModel,
-} from "../models/uncleaned-hotel-data.model";
-import { generateDataMappingFromDictionary } from "../utils";
-import { HotelQueryModel } from "../models/hotel.query.model";
-import { GetOptionModel } from "../models/get-option.model";
+} from '../constants/dictionaries.constant';
+import { Nullable } from '../models/core.model';
+import { AmenitiesNameModel, AmenitiesTypeModel, HotelDataBySupplierModel, ImageModel, ImageTypeModel } from '../models';
+import { UncleanedAmenitiesModel, UncleanedHotelDataModel, UncleanedImageModel, UncleanedImagesModel } from '../models/uncleaned-hotel-data.model';
+import { generateDataMappingFromDictionary } from '../utils';
+import { HotelQueryModel } from '../models/hotel.query.model';
+import { GetOptionModel } from '../models/get-option.model';
 import axios from 'axios';
 
 // TODO: Remove Any
 
-const hotelFieldMapping = generateDataMappingFromDictionary<keyof HotelDataBySupplierModel>(
-  HOTEL_DATA_KEY_DICTIONARY
-);
-const amenitiesNameMapping =
-  generateDataMappingFromDictionary<AmenitiesNameModel>(
-    AMENITY_NAME_DICTIONARY
-  );
-const amenitiesTypeMapping =
-  generateDataMappingFromDictionary<AmenitiesTypeModel>(
-    AMENITY_TYPE_DICTIONARY
-  );
-const amenitiesNameToTypeMapping =
-  generateDataMappingFromDictionary<AmenitiesTypeModel>(
-    AMENITY_TYPE_TO_AMENITY_NAME_DICTIONARY
-  );
-const imageTypeMapping = generateDataMappingFromDictionary<ImageTypeModel>(
-  IMAGE_TYPE_DICTIONARY
-);
-const imageFieldMapping = generateDataMappingFromDictionary<keyof ImageModel>(
-  IMAGE_DATA_KEY_DICTIONARY
-);
+const hotelFieldMapping = generateDataMappingFromDictionary<keyof HotelDataBySupplierModel>(HOTEL_DATA_KEY_DICTIONARY);
+const amenitiesNameMapping = generateDataMappingFromDictionary<AmenitiesNameModel>(AMENITY_NAME_DICTIONARY);
+const amenitiesTypeMapping = generateDataMappingFromDictionary<AmenitiesTypeModel>(AMENITY_TYPE_DICTIONARY);
+const amenitiesNameToTypeMapping = generateDataMappingFromDictionary<AmenitiesTypeModel>(AMENITY_TYPE_TO_AMENITY_NAME_DICTIONARY);
+const imageTypeMapping = generateDataMappingFromDictionary<ImageTypeModel>(IMAGE_TYPE_DICTIONARY);
+const imageFieldMapping = generateDataMappingFromDictionary<keyof ImageModel>(IMAGE_DATA_KEY_DICTIONARY);
 
-function getValueByKey(
-  value: UncleanedHotelDataModel,
-  key: string
-): null | Object {
-  const keys = key.split(".");
+function getValueByKey(value: UncleanedHotelDataModel, key: string): null | Object {
+  const keys = key.split('.');
   let res = value;
 
   for (const k of keys) {
-    if (res && typeof res === "object" && k in res) {
+    if (res && typeof res === 'object' && k in res) {
       res = res[k as keyof UncleanedHotelDataModel] as any;
     } else {
       return null;
@@ -72,16 +40,12 @@ function getValueByKey(
   return res;
 }
 
-function mappingData(
-  data: UncleanedHotelDataModel,
-  key: keyof UncleanedHotelDataModel,
-  newKey: keyof HotelDataBySupplierModel
-): Nullable<Object> {
+function mappingData(data: UncleanedHotelDataModel, key: keyof UncleanedHotelDataModel, newKey: keyof HotelDataBySupplierModel): Nullable<Object> {
   switch (newKey) {
-    case "amenities": {
+    case 'amenities': {
       return mappingAmenitiesData(data[key] as UncleanedAmenitiesModel);
     }
-    case "images": {
+    case 'images': {
       return mappingImagesData(data[key] as UncleanedImagesModel);
     }
     default: {
@@ -90,9 +54,7 @@ function mappingData(
   }
 }
 
-function mappingAmenitiesData(
-  amenities?: UncleanedAmenitiesModel
-): Record<AmenitiesTypeModel, AmenitiesNameModel[]> {
+function mappingAmenitiesData(amenities?: UncleanedAmenitiesModel): Record<AmenitiesTypeModel, AmenitiesNameModel[]> {
   if (!amenities) {
     return {
       [AmenitiesTypeModel.GENERAL]: [],
@@ -107,9 +69,7 @@ function mappingAmenitiesData(
 
   if (Array.isArray(amenities)) {
     (amenities as ReadonlyArray<string>).forEach((amenity) => {
-      const parsedAmenityName = amenitiesNameMapping.get(
-        amenity.trim().toLowerCase()
-      ) as AmenitiesNameModel;
+      const parsedAmenityName = amenitiesNameMapping.get(amenity.trim().toLowerCase()) as AmenitiesNameModel;
       const type = amenitiesNameToTypeMapping.get(parsedAmenityName);
 
       if (type && parsedAmenityName && result[type]) {
@@ -117,26 +77,20 @@ function mappingAmenitiesData(
       }
     });
   } else {
-    Object.entries(amenities as Record<string, ReadonlyArray<string>>).forEach(
-      ([type, data]) => {
-        const newType = amenitiesTypeMapping.get(type);
-        if (newType) {
-          result[newType] = data
-            .map((amenity: string) =>
-              amenitiesNameMapping.get(amenity.trim().toLowerCase())
-            )
-            .filter(Boolean) as AmenitiesNameModel[];
-        }
+    Object.entries(amenities as Record<string, ReadonlyArray<string>>).forEach(([type, data]) => {
+      const newType = amenitiesTypeMapping.get(type);
+      if (newType) {
+        result[newType] = data
+          .map((amenity: string) => amenitiesNameMapping.get(amenity.trim().toLowerCase()))
+          .filter(Boolean) as AmenitiesNameModel[];
       }
-    );
+    });
   }
 
   return result;
 }
 
-function mappingImagesData(
-  images?: UncleanedImagesModel
-): Record<ImageTypeModel, ReadonlyArray<ImageModel>> {
+function mappingImagesData(images?: UncleanedImagesModel): Record<ImageTypeModel, ReadonlyArray<ImageModel>> {
   if (!images) {
     return {
       [ImageTypeModel.ROOM]: [],
@@ -159,7 +113,7 @@ function mappingImagesData(
             res[newKey] = it[key as keyof UncleanedImageModel];
           }
           return res;
-        }, {} as ImageModel)
+        }, {} as ImageModel),
       );
     }
   });
@@ -174,11 +128,7 @@ function cleaningData(data: UncleanedHotelDataModel): HotelDataBySupplierModel {
     const newKey = hotelFieldMapping.get(key);
 
     if (newKey) {
-      result[newKey] = mappingData(
-        data,
-        key as keyof UncleanedHotelDataModel,
-        newKey
-      ) as any;
+      result[newKey] = mappingData(data, key as keyof UncleanedHotelDataModel, newKey) as any;
     }
   });
 
@@ -187,7 +137,7 @@ function cleaningData(data: UncleanedHotelDataModel): HotelDataBySupplierModel {
 
 function combineAmenitiesData(
   first: Record<AmenitiesTypeModel, AmenitiesNameModel[]>,
-  second: Record<AmenitiesTypeModel, AmenitiesNameModel[]>
+  second: Record<AmenitiesTypeModel, AmenitiesNameModel[]>,
 ): Record<AmenitiesTypeModel, AmenitiesNameModel[]> {
   const generalMap: Partial<Record<AmenitiesNameModel, boolean>> = {};
   const roomMap: Partial<Record<AmenitiesNameModel, boolean>> = {};
@@ -205,7 +155,7 @@ function combineAmenitiesData(
 
 function combineImagesData(
   first: Record<ImageTypeModel, ReadonlyArray<ImageModel>>,
-  second: Record<ImageTypeModel, ReadonlyArray<ImageModel>>
+  second: Record<ImageTypeModel, ReadonlyArray<ImageModel>>,
 ): Record<ImageTypeModel, ReadonlyArray<ImageModel>> {
   const roomImages: ImageModel[] = [];
   const amenityImages: ImageModel[] = [];
@@ -221,10 +171,7 @@ function combineImagesData(
   };
 }
 
-function combineBookingConditionsData(
-  first: ReadonlyArray<string>,
-  second: ReadonlyArray<string>
-): string[] {
+function combineBookingConditionsData(first: ReadonlyArray<string>, second: ReadonlyArray<string>): string[] {
   const map: Partial<Record<string, boolean>> = {};
 
   first.forEach((it) => (map[it] = true));
@@ -237,15 +184,9 @@ function combineHotelData(first: HotelDataBySupplierModel, second: HotelDataBySu
   return {
     ...first,
     ...second,
-    amenities: combineAmenitiesData(
-      first.amenities || defaultAmenities,
-      second.amenities || defaultAmenities
-    ),
-    images: combineImagesData(
-      first.images || defaultImages,
-      second.images || defaultImages
-    ),
-    bookingConditions: combineBookingConditionsData(first.bookingConditions || [], second.bookingConditions || [])
+    amenities: combineAmenitiesData(first.amenities || defaultAmenities, second.amenities || defaultAmenities),
+    images: combineImagesData(first.images || defaultImages, second.images || defaultImages),
+    bookingConditions: combineBookingConditionsData(first.bookingConditions || [], second.bookingConditions || []),
   };
 }
 
@@ -274,13 +215,13 @@ function filterHotelDataByQuery(data: UncleanedHotelDataModel[], query?: HotelQu
     if (hotels && hotels.length) {
       const idKeys = HOTEL_DATA_KEY_DICTIONARY.id;
 
-      isMatchedHotelId = idKeys.some((key) => (key in it && hotels.includes(it[key as keyof UncleanedHotelDataModel] as string)))
+      isMatchedHotelId = idKeys.some((key) => key in it && hotels.includes(it[key as keyof UncleanedHotelDataModel] as string));
     }
 
     if (destination) {
       const idKeys = HOTEL_DATA_KEY_DICTIONARY.destinationId;
 
-      isMatchedDestination = idKeys.some((key) => (key in it && it[key as keyof UncleanedHotelDataModel] === destination));
+      isMatchedDestination = idKeys.some((key) => key in it && it[key as keyof UncleanedHotelDataModel] === destination);
     }
 
     return isMatchedHotelId && isMatchedDestination;
@@ -288,20 +229,10 @@ function filterHotelDataByQuery(data: UncleanedHotelDataModel[], query?: HotelQu
 }
 
 async function getAllSuppliers(): Promise<string[]> {
-  return new Promise((resolve) =>
-    resolve([
-      "acme",
-      "patagonia",
-      "paperflies"
-    ])
-  );
+  return new Promise((resolve) => resolve(['acme', 'patagonia', 'paperflies']));
 }
 
-async function getHotelDataBySuppliers(
-  suppliers: string[],
-  query?: HotelQueryModel,
-  options?: GetOptionModel
-): Promise<HotelDataBySupplierModel[]> {
+async function getHotelDataBySuppliers(suppliers: string[], query?: HotelQueryModel, options?: GetOptionModel): Promise<HotelDataBySupplierModel[]> {
   return new Promise(async (resolve, reject) => {
     const { batch } = options || defaultGetOption;
     const result: HotelDataBySupplierModel[] = [];
@@ -313,11 +244,7 @@ async function getHotelDataBySuppliers(
         const data: UncleanedHotelDataModel[][] = await Promise.all(
           suppliers
             .slice(start, start + batch)
-            .map((supplier) =>
-              axios.get(
-                `https://5f2be0b4ffc88500167b85a0.mockapi.io/suppliers/${supplier}`
-              ).then((it) => it.data)
-            )
+            .map((supplier) => axios.get(`https://5f2be0b4ffc88500167b85a0.mockapi.io/suppliers/${supplier}`).then((it) => it.data)),
         );
 
         data.forEach((it) => {

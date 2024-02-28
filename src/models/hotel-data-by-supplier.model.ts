@@ -1,4 +1,4 @@
-import { AmenitiesNameModel, AmenitiesTypeModel, ImageModel, ImageTypeModel } from "./hotel.model";
+import { AmenitiesNameModel, AmenitiesTypeModel, ImageModel, ImageTypeModel } from './hotel.model';
 
 export interface HotelDataBySupplierModel {
   id: string;

@@ -1,8 +1,6 @@
-import { HotelDataBySupplierModel, HotelModel } from "../models";
+import { HotelDataBySupplierModel, HotelModel } from '../models';
 
-export function convertToHotelModel(
-  data: HotelDataBySupplierModel
-): HotelModel {
+export function convertToHotelModel(data: HotelDataBySupplierModel): HotelModel {
   return {
     id: data.id,
     destinationId: data.destinationId,

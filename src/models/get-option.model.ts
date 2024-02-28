@@ -1,3 +1,3 @@
 export interface GetOptionModel {
-    batch: number;
+  batch: number;
 }
