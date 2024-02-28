@@ -10,11 +10,12 @@ module.exports = {
   env: {
     es6: true,
     node: true,
+    jest: true
   },
   rules: {
     "no-var": "error",
     semi: "error",
-    indent: ["error", 2, { SwitchCase: 1 }],
+    indent: 'off',
     "no-multi-spaces": "error",
     "space-in-parens": "error",
     "no-multiple-empty-lines": "error",

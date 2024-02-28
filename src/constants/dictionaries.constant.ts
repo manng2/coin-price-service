@@ -1,5 +1,5 @@
 import { HotelDataBySupplierModel } from '../models';
-import { AmenitiesNameModel, AmenitiesTypeModel, HotelModel, ImageModel, ImageTypeModel } from '../models/hotel.model';
+import { AmenitiesNameModel, AmenitiesTypeModel, ImageModel, ImageTypeModel } from '../models/hotel.model';
 
 export const HOTEL_DATA_KEY_DICTIONARY: Record<keyof HotelDataBySupplierModel, string[]> = {
   id: ['Id', 'id', 'hotel_id'],
