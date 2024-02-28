@@ -1,3 +1,5 @@
+import { Nullable } from "./core.model";
+
 export enum ImageTypeModel {
   ROOM = "rooms",
   AMENITY = "amenity",
@@ -44,7 +46,7 @@ export interface HotelModel {
     country: string;
   };
   description: string;
-  amenities: Record<AmenitiesTypeModel, AmenitiesNameModel[]>;
-  images: Record<ImageTypeModel, ReadonlyArray<ImageModel>>;
-  bookingConditions: ReadonlyArray<string>;
+  amenities: Nullable<Record<AmenitiesTypeModel, AmenitiesNameModel[]>>;
+  images: Nullable<Record<ImageTypeModel, ReadonlyArray<ImageModel>>>;
+  bookingConditions: Nullable<ReadonlyArray<string>>;
 }

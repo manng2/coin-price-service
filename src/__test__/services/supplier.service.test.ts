@@ -1,16 +1,15 @@
+import axios from "axios";
 import {
-  AmenitiesNameModel,
-  HotelDataBySupplierModel,
-  UncleanedHotelDataModel,
+  HotelDataBySupplierModel
 } from "../../models";
 import { supplierService } from "../../services";
-import axios from "axios";
 import {
   CLEANED_HOTEL_MOCK_DATA,
   CLEANED_HOTEL_MOCK_DATA_TEST_MERGING,
   DIRTY_HOTEL_MOCK_DATA,
   DIRTY_HOTEL_MOCK_DATA_TEST_MERGING,
 } from "../constants/hotel-data.constant";
+import { defaultAmenities } from "../../constants/default-data.constant";
 
 jest.mock("axios");
 
@@ -85,6 +84,18 @@ describe("Supplier Service", () => {
         hotelData.forEach((data, index) => {
             expect(data.images).toEqual(cleanedHotelData[index].images);
         });
-    })
+    });
+
+    test("amenities should be merged", () => {
+        hotelData.forEach((data, index) => {
+          expect(data.amenities).toEqual(cleanedHotelData[index].amenities);
+        });
+    });
+
+    test("booking conditions should be merged", () => {
+        hotelData.forEach((data, index) => {
+          expect(new Set(data.bookingConditions)).toEqual(new Set(cleanedHotelData[index].bookingConditions));
+        });
+    });
   })
 });

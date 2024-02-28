@@ -78,8 +78,8 @@ const cleanedMockData2: HotelDataBySupplierModel = {
   description: "Description 2",
   bookingConditions: ["Booking Condition 2"],
   amenities: {
-    general: [AmenitiesNameModel.BAR],
-    room: [AmenitiesNameModel.BREAKFAST, AmenitiesNameModel.BATHTUB],
+    general: [],
+    room: [AmenitiesNameModel.BREAKFAST, AmenitiesNameModel.BAR, AmenitiesNameModel.BATHTUB],
   },
   images: {
     rooms: [
@@ -106,8 +106,8 @@ const uncleanedMockData3: UncleanedHotelDataModel = {
   info: "Description 3",
   address: "Address 3",
   amenities: {
-    general: [AmenitiesNameModel.BREAKFAST, AmenitiesNameModel.BAR],
-    room: [AmenitiesNameModel.BATHTUB],
+    general: [],
+    room: [AmenitiesNameModel.BATHTUB, AmenitiesNameModel.BREAKFAST, AmenitiesNameModel.BAR],
   },
 };
 
@@ -123,8 +123,8 @@ const cleanedMockData3: HotelDataBySupplierModel = {
   description: "Description 3",
   bookingConditions: [],
   amenities: {
-    general: [AmenitiesNameModel.BREAKFAST, AmenitiesNameModel.BAR],
-    room: [AmenitiesNameModel.BATHTUB],
+    general: [],
+    room: [AmenitiesNameModel.BATHTUB, AmenitiesNameModel.BREAKFAST, AmenitiesNameModel.BAR],
   },
   images: {
     rooms: [],
@@ -147,6 +147,10 @@ const uncleanedMockDataMerging1: UncleanedHotelDataModel = {
   PostalCode: "Postal Code 1",
   Description: "Description 1",
   Facilities: ["Facility 1"],
+  amenities: {
+    general: [AmenitiesNameModel.BUSINESS_CENTER],
+    room: [AmenitiesNameModel.BATHTUB, AmenitiesNameModel.KETTLE],
+  },
   images: {
     room: [
       {
@@ -160,7 +164,8 @@ const uncleanedMockDataMerging1: UncleanedHotelDataModel = {
         description: "Description 1",
       }
     ]
-  }
+  },
+  booking_conditions: ["Booking Condition 2", "Booking Condition 3"],
 };
 
 const uncleanedMockDataMerging1_1: UncleanedHotelDataModel = {
@@ -172,6 +177,7 @@ const uncleanedMockDataMerging1_1: UncleanedHotelDataModel = {
     AmenitiesNameModel.BREAKFAST,
     AmenitiesNameModel.BAR,
     AmenitiesNameModel.BATHTUB,
+    AmenitiesNameModel.BUSINESS_CENTER
   ],
   images: {
     room: [
@@ -187,7 +193,7 @@ const uncleanedMockDataMerging1_1: UncleanedHotelDataModel = {
       },
     ],
   },
-  booking_conditions: ["Booking Condition 2"],
+  booking_conditions: ["Booking Condition 1"],
 }
 
 const cleanedMockDataMerging1: HotelDataBySupplierModel = {
@@ -200,10 +206,10 @@ const cleanedMockDataMerging1: HotelDataBySupplierModel = {
   city: "City 1",
   country: "Country 1",
   description: "Description 1",
-  bookingConditions: ["Booking Condition 1"],
+  bookingConditions: ["Booking Condition 1", "Booking Condition 2", "Booking Condition 3"],
   amenities: {
-    general: [],
-    room: [],
+    general: [AmenitiesNameModel.BUSINESS_CENTER],
+    room: [AmenitiesNameModel.BATHTUB, AmenitiesNameModel.KETTLE, AmenitiesNameModel.BREAKFAST, AmenitiesNameModel.BAR],
   },
   images: {
     rooms: [

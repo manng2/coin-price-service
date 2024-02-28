@@ -15,8 +15,8 @@ export function convertToHotelModel(
       country: data.country,
     },
     description: data.description,
-    amenities: data.amenities!,
-    images: data.images!,
-    bookingConditions: data.bookingConditions,
+    amenities: data.amenities || null,
+    images: data.images || null,
+    bookingConditions: data.bookingConditions || null,
   };
 }
