@@ -14,6 +14,7 @@ export async function getHotelData(req: Request, res: Response) {
 
         res.status(200).send(hotelData);
     } catch(err) {
+        console.trace(err);
         res.status(500).json({ message: (err as Error).message })
     }
 }

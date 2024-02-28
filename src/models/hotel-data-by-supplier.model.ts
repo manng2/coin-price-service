@@ -12,5 +12,5 @@ export interface HotelDataBySupplierModel {
   description: string;
   amenities?: Record<AmenitiesTypeModel, AmenitiesNameModel[]>;
   images?: Record<ImageTypeModel, ReadonlyArray<ImageModel>>;
-  bookingConditions: ReadonlyArray<string>;
+  bookingConditions?: ReadonlyArray<string>;
 }

@@ -17,35 +17,34 @@ export const HOTEL_DATA_KEY_DICTIONARY: Record<keyof HotelDataBySupplierModel, s
 };
 
 export const AMENITY_NAME_DICTIONARY: Record<AmenitiesNameModel, string[]> = {
-  [AmenitiesNameModel.POOL]: ["Pool"],
-  [AmenitiesNameModel.WIFI]: ["WiFi", "Wifi", "wifi"],
-  [AmenitiesNameModel.AIR_CON]: ["Air Conditioner", "Air conditioner"],
-  [AmenitiesNameModel.BATHTUB]: ["Bath Tub", "BathTub", "bathtub"],
-  [AmenitiesNameModel.BREAKFAST]: ["Breakfast", "breakfast"],
-  [AmenitiesNameModel.BAR]: ["Bar", "minibar", "bar"],
+  [AmenitiesNameModel.POOL]: ["pool"],
+  [AmenitiesNameModel.WIFI]: ["wifi"],
+  [AmenitiesNameModel.AIR_CON]: ["air conditioner", "air conditioning", "aircon"],
+  [AmenitiesNameModel.BATHTUB]: ["bath tub", "bathtub"],
+  [AmenitiesNameModel.BREAKFAST]: ["breakfast"],
+  [AmenitiesNameModel.BAR]: ["minibar", "bar"],
   [AmenitiesNameModel.DRY_CLEANING]: [
-    "DryCleaning",
+    "drycleaning",
     "dry cleaning",
-    "dryCleaning",
   ],
   [AmenitiesNameModel.BUSINESS_CENTER]: [
-    "BusinessCenter",
-    "Business Center",
+    "businesscenter",
+    "business center",
     "business center",
   ],
-  [AmenitiesNameModel.KETTLE]: ["kettle", "Kettle"],
-  [AmenitiesNameModel.TV]: ["tv", "TV"],
-  [AmenitiesNameModel.HAIRDRYER]: ["hairDryer", "hairDryer", "hair dryer"],
-  [AmenitiesNameModel.IRON]: ["iron", "Iron"],
-  [AmenitiesNameModel.COFFEE_MACHINE]: ["coffeeMachine", "coffee machine"],
-  [AmenitiesNameModel.CHILDCARE]: ["childcare", "ChildCare"],
-  [AmenitiesNameModel.OUTDOOR_POOL]: ["outdoor pool", "OutdoorPool"],
-  [AmenitiesNameModel.INDOOR_POOL]: ["indoor pool", "IndoorPool"],
+  [AmenitiesNameModel.KETTLE]: ["kettle"],
+  [AmenitiesNameModel.TV]: ["tv"],
+  [AmenitiesNameModel.HAIRDRYER]: ["hairdryer", "hair dryer"],
+  [AmenitiesNameModel.IRON]: ["iron"],
+  [AmenitiesNameModel.COFFEE_MACHINE]: ["coffeemachine", "coffee machine"],
+  [AmenitiesNameModel.CHILDCARE]: ["childcare", "child care"],
+  [AmenitiesNameModel.OUTDOOR_POOL]: ["outdoor pool", "outdoorpool"],
+  [AmenitiesNameModel.INDOOR_POOL]: ["indoor pool", "indoorpool"],
 };
 
 export const AMENITY_TYPE_DICTIONARY: Record<AmenitiesTypeModel, string[]> = {
-  [AmenitiesTypeModel.GENERAL]: ["general", "General", "Other"],
-  [AmenitiesTypeModel.ROOM]: ["room", "Room"],
+  [AmenitiesTypeModel.GENERAL]: ["general", "other"],
+  [AmenitiesTypeModel.ROOM]: ["room"],
 };
 
 export const AMENITY_TYPE_TO_AMENITY_NAME_DICTIONARY: Record<
@@ -53,8 +52,6 @@ export const AMENITY_TYPE_TO_AMENITY_NAME_DICTIONARY: Record<
   AmenitiesNameModel[]
 > = {
   [AmenitiesTypeModel.GENERAL]: [
-    AmenitiesNameModel.BAR,
-    AmenitiesNameModel.BREAKFAST,
     AmenitiesNameModel.BUSINESS_CENTER,
     AmenitiesNameModel.POOL,
     AmenitiesNameModel.COFFEE_MACHINE,
@@ -72,11 +69,12 @@ export const AMENITY_TYPE_TO_AMENITY_NAME_DICTIONARY: Record<
     AmenitiesNameModel.AIR_CON,
     AmenitiesNameModel.DRY_CLEANING,
     AmenitiesNameModel.IRON,
+    AmenitiesNameModel.BAR,
   ],
 };
 
 export const IMAGE_TYPE_DICTIONARY: Record<ImageTypeModel, string[]> = {
-  [ImageTypeModel.ROOM]: ["rooms", "Rooms", "room"],
+  [ImageTypeModel.ROOM]: ["rooms", "room"],
   [ImageTypeModel.AMENITY]: ["site", "amenities"],
 };
 

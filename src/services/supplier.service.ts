@@ -91,7 +91,7 @@ function mappingData(
 }
 
 function mappingAmenitiesData(
-  amenities: UncleanedAmenitiesModel
+  amenities?: UncleanedAmenitiesModel
 ): Record<AmenitiesTypeModel, AmenitiesNameModel[]> {
   if (!amenities) {
     return {
@@ -135,7 +135,7 @@ function mappingAmenitiesData(
 }
 
 function mappingImagesData(
-  images: UncleanedImagesModel
+  images?: UncleanedImagesModel
 ): Record<ImageTypeModel, ReadonlyArray<ImageModel>> {
   if (!images) {
     return {
@@ -221,6 +221,18 @@ function combineImagesData(
   };
 }
 
+function combineBookingConditionsData(
+  first: ReadonlyArray<string>,
+  second: ReadonlyArray<string>
+): string[] {
+  const map: Partial<Record<string, boolean>> = {};
+
+  first.forEach((it) => (map[it] = true));
+  second.forEach((it) => (map[it] = true));
+
+  return Object.keys(map);
+}
+
 function combineHotelData(first: HotelDataBySupplierModel, second: HotelDataBySupplierModel): HotelDataBySupplierModel {
   return {
     ...first,
@@ -233,6 +245,7 @@ function combineHotelData(first: HotelDataBySupplierModel, second: HotelDataBySu
       first.images || defaultImages,
       second.images || defaultImages
     ),
+    bookingConditions: combineBookingConditionsData(first.bookingConditions || [], second.bookingConditions || [])
   };
 }
 
