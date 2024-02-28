@@ -76,7 +76,7 @@ export const AMENITY_TYPE_TO_AMENITY_NAME_DICTIONARY: Record<
 };
 
 export const IMAGE_TYPE_DICTIONARY: Record<ImageTypeModel, string[]> = {
-  [ImageTypeModel.ROOM]: ["rooms", "Rooms"],
+  [ImageTypeModel.ROOM]: ["rooms", "Rooms", "room"],
   [ImageTypeModel.AMENITY]: ["site", "amenities"],
 };
 

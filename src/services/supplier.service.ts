@@ -28,6 +28,7 @@ import {
 import { generateDataMappingFromDictionary } from "../utils";
 import { HotelQueryModel } from "../models/hotel.query.model";
 import { GetOptionModel } from "../models/get-option.model";
+import axios from 'axios';
 
 // TODO: Remove Any
 
@@ -300,9 +301,9 @@ async function getHotelDataBySuppliers(
           suppliers
             .slice(start, start + batch)
             .map((supplier) =>
-              fetch(
+              axios.get(
                 `https://5f2be0b4ffc88500167b85a0.mockapi.io/suppliers/${supplier}`
-              ).then((it) => it.json())
+              ).then((it) => it.data)
             )
         );
 
