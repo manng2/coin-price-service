@@ -233,35 +233,33 @@ async function getAllSuppliers(): Promise<string[]> {
 }
 
 async function getHotelDataBySuppliers(suppliers: string[], query?: HotelQueryModel, options?: GetOptionModel): Promise<HotelDataBySupplierModel[]> {
-  return new Promise(async (resolve, reject) => {
-    const { batch } = options || defaultGetOption;
-    const result: HotelDataBySupplierModel[] = [];
-    let size = suppliers.length;
-    let start = 0;
+  const { batch } = options || defaultGetOption;
+  const result: HotelDataBySupplierModel[] = [];
+  let size = suppliers.length;
+  let start = 0;
 
-    try {
-      while (size > 0) {
-        const data: UncleanedHotelDataModel[][] = await Promise.all(
-          suppliers
-            .slice(start, start + batch)
-            .map((supplier) => axios.get(`https://5f2be0b4ffc88500167b85a0.mockapi.io/suppliers/${supplier}`).then((it) => it.data)),
-        );
+  try {
+    while (size > 0) {
+      const data: UncleanedHotelDataModel[][] = await Promise.all(
+        suppliers
+          .slice(start, start + batch)
+          .map((supplier) => axios.get(`https://5f2be0b4ffc88500167b85a0.mockapi.io/suppliers/${supplier}`).then((it) => it.data)),
+      );
 
-        data.forEach((it) => {
-          filterHotelDataByQuery(it, query).forEach((d) => {
-            result.push(cleaningData(d));
-          });
+      data.forEach((it) => {
+        filterHotelDataByQuery(it, query).forEach((d) => {
+          result.push(cleaningData(d));
         });
+      });
 
-        size -= batch;
-        start += batch;
-      }
-
-      resolve(mergingData(result));
-    } catch (error) {
-      reject(error);
+      size -= batch;
+      start += batch;
     }
-  });
+
+    return mergingData(result);
+  } catch (error) {
+    throw new Error((error as Error).message);
+  }
 }
 
 export const supplierService = {
