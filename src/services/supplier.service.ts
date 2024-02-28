@@ -255,22 +255,22 @@ function filterHotelDataByQuery(data: UncleanedHotelDataModel[], query?: HotelQu
   const { hotels, destination } = query || {};
 
   return data.filter((it) => {
-    let isFilteredByHotel = false;
-    let isFilteredByDestination = false;
+    let isMatchedHotelId = true;
+    let isMatchedDestination = true;
 
     if (hotels && hotels.length) {
       const idKeys = HOTEL_DATA_KEY_DICTIONARY.id;
 
-      isFilteredByHotel = idKeys.some((key) => (key in it && hotels.includes(it[key as keyof UncleanedHotelDataModel] as string)))
+      isMatchedHotelId = idKeys.some((key) => (key in it && hotels.includes(it[key as keyof UncleanedHotelDataModel] as string)))
     }
 
     if (destination) {
       const idKeys = HOTEL_DATA_KEY_DICTIONARY.destinationId;
 
-      isFilteredByDestination = idKeys.some((key) => (key in it && it[key as keyof UncleanedHotelDataModel] === destination));
+      isMatchedDestination = idKeys.some((key) => (key in it && it[key as keyof UncleanedHotelDataModel] === destination));
     }
 
-    return !isFilteredByDestination && !isFilteredByHotel;
+    return isMatchedHotelId && isMatchedDestination;
   });
 }
 

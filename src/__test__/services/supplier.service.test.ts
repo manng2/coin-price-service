@@ -5,134 +5,12 @@ import {
 } from "../../models";
 import { supplierService } from "../../services";
 import axios from "axios";
-
-const uncleanedMockData1: UncleanedHotelDataModel = {
-  Id: "1",
-  DestinationId: 1,
-  Name: "Hotel 1",
-  Latitude: 1,
-  Longitude: 1,
-  Address: "Address 1",
-  City: "City 1",
-  Country: "Country 1",
-  PostalCode: "Postal Code 1",
-  Description: "Description 1",
-  Facilities: ["Facility 1"],
-};
-
-const cleanedMockData1: HotelDataBySupplierModel = {
-  id: "1",
-  destinationId: 1,
-  name: "Hotel 1",
-  lat: 1,
-  lng: 1,
-  address: "Address 1",
-  city: "City 1",
-  country: "Country 1",
-  description: "Description 1",
-  bookingConditions: ["Booking Condition 1"],
-  amenities: {
-    general: [],
-    room: [],
-  },
-  images: {
-    rooms: [],
-    amenity: [],
-  }
-};
-
-const uncleanedMockData2: UncleanedHotelDataModel = {
-  hotel_id: "2",
-  destination_id: 2,
-  hotel_name: "Hotel 2",
-  details: "Description 2",
-  amenities: [
-    AmenitiesNameModel.BREAKFAST,
-    AmenitiesNameModel.BAR,
-    AmenitiesNameModel.BATHTUB,
-  ],
-  images: {
-    room: [
-      {
-        url: "URL 2",
-        description: "Description 2",
-      },
-    ],
-    site: [
-      {
-        link: "Link 2",
-        caption: "Caption 2",
-      },
-    ],
-  },
-  booking_conditions: ["Booking Condition 2"],
-};
-
-const cleanedMockData2: HotelDataBySupplierModel = {
-  id: "2",
-  destinationId: 2,
-  name: "Hotel 2",
-  lat: 2,
-  lng: 2,
-  address: "Address 2",
-  city: "City 2",
-  country: "Country 2",
-  description: "Description 2",
-  bookingConditions: ["Booking Condition 2"],
-  amenities: {
-    general: [AmenitiesNameModel.BAR],
-    room: [AmenitiesNameModel.BREAKFAST, AmenitiesNameModel.BATHTUB],
-  },
-  images: {
-    rooms: [
-      {
-        link: "URL 2",
-        description: "Description 2",
-      },
-    ],
-    amenity: [
-      {
-        link: "Link 2",
-        description: "Caption 2",
-      },
-    ],
-  },
-};
-
-const uncleanedMockData3: UncleanedHotelDataModel = {
-    id: "3",
-    destination: 3,
-    name: "Hotel 3",
-    lat: 3,
-    lng: 3,
-    info: "Description 3",
-    address: "Address 3",
-    amenities: {
-        general: [AmenitiesNameModel.BREAKFAST, AmenitiesNameModel.BAR],
-        room: [AmenitiesNameModel.BATHTUB],
-    }
-}
-
-const cleanedMockData3: HotelDataBySupplierModel = {
-    id: "3",
-    destinationId: 3,
-    name: "Hotel 3",
-    lat: 3,
-    lng: 3,
-    address: "Address 3",
-    city: "City 3",
-    country: "Country 3",
-    description: "Description 3",
-    bookingConditions: [],
-    amenities: {
-        general: [AmenitiesNameModel.BREAKFAST, AmenitiesNameModel.BAR],
-        room: [AmenitiesNameModel.BATHTUB],
-    },
-    images: {
-        rooms: [],
-        amenity: []
-    }
-}
+import {
+  CLEANED_HOTEL_MOCK_DATA,
+  CLEANED_HOTEL_MOCK_DATA_TEST_MERGING,
+  DIRTY_HOTEL_MOCK_DATA,
+  DIRTY_HOTEL_MOCK_DATA_TEST_MERGING,
+} from "../constants/hotel-data.constant";
 
 jest.mock("axios");
 
@@ -142,15 +20,15 @@ describe("Supplier Service", () => {
     expect(suppliers.length).toBeGreaterThan(0);
   });
 
-  describe("Test Procurement of Hotel Data", () => {
+  describe("Procurement of Hotel Data", () => {
     let hotelData: HotelDataBySupplierModel[] = [];
-    const cleanedMockData = [cleanedMockData1, cleanedMockData2, cleanedMockData3];
+    const cleanedMockData = CLEANED_HOTEL_MOCK_DATA;
 
     beforeAll(async () => {
       (axios.get as any).mockResolvedValue({
-        data: [uncleanedMockData1, uncleanedMockData2, uncleanedMockData3],
+        data: DIRTY_HOTEL_MOCK_DATA,
       });
-      hotelData = await supplierService.getHotelDataBySuppliers(['ecma']);
+      hotelData = await supplierService.getHotelDataBySuppliers(["ecma"]);
     });
 
     test("should return hotel data from suppliers", async () => {
@@ -166,5 +44,47 @@ describe("Supplier Service", () => {
         });
       });
     });
+
+    describe("Test Filtering of Hotel Data", () => {
+      beforeAll(async () => {
+        (axios.get as any).mockResolvedValue({
+          data: DIRTY_HOTEL_MOCK_DATA,
+        });
+      });
+
+      test("should return filtered hotel data", async () => {
+        const data = await supplierService.getHotelDataBySuppliers(["ecma"], {
+          hotels: ["1"],
+        });
+        expect(data.filter((it) => it.id === "1").length).toBe(data.length);
+      });
+
+      test("should return filtered destination data", async () => {
+        const data = await supplierService.getHotelDataBySuppliers(["ecma"], {
+          destination: 1,
+        });
+        expect(data.filter((it) => it.destinationId === 1).length).toBe(
+          data.length
+        );
+      });
+    });
   });
+
+  describe("Merging of Hotel Data", () => {
+    let hotelData: HotelDataBySupplierModel[] = [];
+    const cleanedHotelData: HotelDataBySupplierModel[] = CLEANED_HOTEL_MOCK_DATA_TEST_MERGING;
+
+    beforeAll(async () => {
+        (axios.get as any).mockResolvedValue({
+            data: DIRTY_HOTEL_MOCK_DATA_TEST_MERGING,
+        });
+
+        hotelData = await supplierService.getHotelDataBySuppliers(["ecma"]);
+    });
+    test("image data should be merged", () => {
+        hotelData.forEach((data, index) => {
+            expect(data.images).toEqual(cleanedHotelData[index].images);
+        });
+    })
+  })
 });
