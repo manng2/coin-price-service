@@ -27,15 +27,34 @@ describe('Supplier Service', () => {
       hotelData = await supplierService.getHotelDataBySuppliers(['ecma']);
     });
 
-    test('should return hotel data from suppliers', async () => {
+    test('should return hotel data from suppliers', () => {
       expect(hotelData.length).toBeGreaterThan(0);
     });
 
-    test('cleaned data should match cleaned mock data', async () => {
+    test('cleaned data should match cleaned mock data', () => {
       hotelData.forEach((data, index) => {
         Object.keys(data).forEach((key) => {
           expect(data[key as keyof HotelDataBySupplierModel]).toEqual(cleanedMockData[index][key as keyof HotelDataBySupplierModel]);
         });
+      });
+    });
+
+    test('should be able to read data from nested key format', async () => {
+      (axios.get as any).mockResolvedValue({
+        data: [
+          {
+            id: '1',
+            location: {
+              address: 'Address 1',
+            },
+          },
+        ],
+      });
+      hotelData = await supplierService.getHotelDataBySuppliers(['ecma']);
+
+      expect(hotelData[0]).toEqual({
+        id: '1',
+        address: 'Address 1',
       });
     });
 

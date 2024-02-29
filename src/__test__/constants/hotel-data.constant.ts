@@ -180,6 +180,10 @@ const uncleanedMockDataMerging1_1: UncleanedHotelDataModel = {
       },
     ],
   },
+  location: {
+    address: 'Address 1',
+    country: 'Country 1',
+  },
   booking_conditions: ['Booking Condition 1'],
 };
 

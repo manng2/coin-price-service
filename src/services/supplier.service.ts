@@ -167,7 +167,7 @@ function cleaningData(data: UncleanedHotelDataModel): HotelDataBySupplierModel {
  * @param second  Amenities from second hotel data by supplier model
  * @returns Combined amenities data
  */
-function combineAmenitiesData(
+function combineAmenitiesAttribute(
   first: Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>>,
   second: Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>>,
 ): Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>> {
@@ -191,7 +191,7 @@ function combineAmenitiesData(
  * @param second Images from second hotel data by supplier model
  * @returns Combined images data
  */
-function combineImagesData(
+function combineImagesAttribute(
   first: Record<ImageTypeModel, ReadonlyArray<ImageModel>>,
   second: Record<ImageTypeModel, ReadonlyArray<ImageModel>>,
 ): Record<ImageTypeModel, ReadonlyArray<ImageModel>> {
@@ -215,7 +215,7 @@ function combineImagesData(
  * @param second Booking conditions from second hotel data by supplier model
  * @returns Combined booking conditions data
  */
-function combineBookingConditionsData(first: ReadonlyArray<string>, second: ReadonlyArray<string>): string[] {
+function combineBookingConditionsAttribute(first: ReadonlyArray<string>, second: ReadonlyArray<string>): string[] {
   const map: Partial<Record<string, boolean>> = {};
 
   first.forEach((it) => (map[it] = true));
@@ -230,13 +230,13 @@ function combineBookingConditionsData(first: ReadonlyArray<string>, second: Read
  * @param second Second hotel data by supplier model
  * @returns Merged hotel data by supplier model
  */
-function combineHotelData(first: HotelDataBySupplierModel, second: HotelDataBySupplierModel): HotelDataBySupplierModel {
+function combineAttributes(first: HotelDataBySupplierModel, second: HotelDataBySupplierModel): HotelDataBySupplierModel {
   return {
     ...first,
     ...second,
-    amenities: combineAmenitiesData(first.amenities || defaultAmenities, second.amenities || defaultAmenities),
-    images: combineImagesData(first.images || defaultImages, second.images || defaultImages),
-    bookingConditions: combineBookingConditionsData(first.bookingConditions || [], second.bookingConditions || []),
+    amenities: combineAmenitiesAttribute(first.amenities || defaultAmenities, second.amenities || defaultAmenities),
+    images: combineImagesAttribute(first.images || defaultImages, second.images || defaultImages),
+    bookingConditions: combineBookingConditionsAttribute(first.bookingConditions || [], second.bookingConditions || []),
   };
 }
 
@@ -245,13 +245,13 @@ function combineHotelData(first: HotelDataBySupplierModel, second: HotelDataBySu
  * @param data Multiple hotel data by supplier model
  * @returns Merged hotel data by supplier model
  */
-function mergingData(data: ReadonlyArray<HotelDataBySupplierModel>): HotelDataBySupplierModel[] {
+function mergingHotelDataById(data: ReadonlyArray<HotelDataBySupplierModel>): HotelDataBySupplierModel[] {
   const result: Record<string, HotelDataBySupplierModel> = {};
 
   data.forEach((it) => {
     const id = it.id;
     if (id in result) {
-      result[id] = combineHotelData(result[id], it);
+      result[id] = combineAttributes(result[id], it);
     } else {
       result[id] = it;
     }
@@ -329,7 +329,7 @@ async function getHotelDataBySuppliers(
       start += batch;
     }
 
-    return mergingData(result);
+    return mergingHotelDataById(result);
   } catch (error) {
     console.trace('- ERROR: Error was found', (error as Error).message);
     throw new Error((error as Error).message);
