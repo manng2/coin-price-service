@@ -88,8 +88,8 @@ function mappingAmenitiesData(amenities?: UncleanedAmenitiesModel): Record<Ameni
 
   if (Array.isArray(amenities)) {
     (amenities as ReadonlyArray<string>).forEach((amenity) => {
-      const parsedAmenityName = amenitiesNameMapping.get(amenity.trim().toLowerCase()) as AmenitiesNameModel;
-      const type = amenitiesNameToTypeMapping.get(parsedAmenityName);
+      const parsedAmenityName = amenitiesNameMapping[amenity.trim().toLowerCase() as AmenitiesNameModel];
+      const type = amenitiesNameToTypeMapping[parsedAmenityName];
 
       if (type && parsedAmenityName && result[type]) {
         result[type].push(parsedAmenityName);
@@ -97,11 +97,9 @@ function mappingAmenitiesData(amenities?: UncleanedAmenitiesModel): Record<Ameni
     });
   } else {
     Object.entries(amenities as Record<string, ReadonlyArray<string>>).forEach(([type, data]) => {
-      const newType = amenitiesTypeMapping.get(type);
+      const newType = amenitiesTypeMapping[type];
       if (newType) {
-        result[newType] = data
-          .map((amenity: string) => amenitiesNameMapping.get(amenity.trim().toLowerCase()))
-          .filter(Boolean) as AmenitiesNameModel[];
+        result[newType] = data.map((amenity: string) => amenitiesNameMapping[amenity.trim().toLowerCase()]).filter(Boolean) as AmenitiesNameModel[];
       }
     });
   }
@@ -128,11 +126,11 @@ function mappingImagesData(images?: UncleanedImagesModel): Record<ImageTypeModel
   };
 
   Object.entries(images).forEach(([type, data]) => {
-    const newType = imageTypeMapping.get(type);
+    const newType = imageTypeMapping[type];
     if (newType) {
       result[newType] = data.map((it: UncleanedImageModel) =>
         Object.keys(it).reduce((res, key) => {
-          const newKey = imageFieldMapping.get(key);
+          const newKey = imageFieldMapping[key];
           if (newKey) {
             res[newKey] = it[key as keyof UncleanedImageModel];
           }
@@ -154,7 +152,7 @@ function cleaningData(data: UncleanedHotelDataModel): HotelDataBySupplierModel {
   const result: Partial<HotelDataBySupplierModel> = {};
 
   Object.keys(data).forEach((key) => {
-    const newKey = hotelFieldMapping.get(key);
+    const newKey = hotelFieldMapping[key];
 
     if (newKey) {
       result[newKey] = mappingData(data, key as keyof UncleanedHotelDataModel, newKey) as any;
