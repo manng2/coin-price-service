@@ -25,14 +25,14 @@ async function writeData(key: string, data: any, options: SetOptions, isCompress
   }
 }
 
-async function readData(key: string, compressed: any) {
+async function readData(key: string, isCompressed: boolean) {
   let cachedValue = undefined;
   if (isRedisWorking()) {
     cachedValue = await client.get(key);
     console.log('- INFO: Read value from key', key);
     if (cachedValue) {
       console.log('- INFO: Founded value for key', key);
-      if (compressed) {
+      if (isCompressed) {
         return zlib.inflateSync(Buffer.from(cachedValue, 'base64')).toString();
       } else {
         return cachedValue;

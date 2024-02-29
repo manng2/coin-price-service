@@ -14,9 +14,7 @@ import { Nullable } from '../models/core.model';
 import { GetOptionModel } from '../models/get-option.model';
 import { HotelQueryModel } from '../models/hotel.query.model';
 import { UncleanedAmenitiesModel, UncleanedHotelDataModel, UncleanedImageModel, UncleanedImagesModel } from '../models/uncleaned-hotel-data.model';
-import { generateDataMappingFromDictionary } from '../utils';
-
-// TODO: Remove Any
+import { generateDataMappingFromDictionary, getAllKeys } from '../utils';
 
 const hotelFieldMapping = generateDataMappingFromDictionary<keyof HotelDataBySupplierModel>(HOTEL_DATA_KEY_DICTIONARY);
 const amenitiesNameMapping = generateDataMappingFromDictionary<AmenitiesNameModel>(AMENITY_NAME_DICTIONARY);
@@ -150,8 +148,9 @@ function mappingImagesData(images?: UncleanedImagesModel): Record<ImageTypeModel
  */
 function cleaningData(data: UncleanedHotelDataModel): HotelDataBySupplierModel {
   const result: Partial<HotelDataBySupplierModel> = {};
+  const keys = getAllKeys(data);
 
-  Object.keys(data).forEach((key) => {
+  keys.forEach((key) => {
     const newKey = hotelFieldMapping[key];
 
     if (newKey) {
@@ -261,6 +260,12 @@ function mergingData(data: ReadonlyArray<HotelDataBySupplierModel>): HotelDataBy
   return Object.values(result);
 }
 
+/**
+ * Filter hotel data by query
+ * @param data Hotel data by supplier model
+ * @param query Hotel query model
+ * @returns Filtered hotel data by supplier model
+ */
 function filterHotelDataByQuery(data: ReadonlyArray<UncleanedHotelDataModel>, query?: HotelQueryModel): ReadonlyArray<UncleanedHotelDataModel> {
   const { hotels, destination } = query || {};
 
@@ -270,8 +275,16 @@ function filterHotelDataByQuery(data: ReadonlyArray<UncleanedHotelDataModel>, qu
 
     if (hotels && hotels.length) {
       const idKeys = HOTEL_DATA_KEY_DICTIONARY.id;
+      const hotelIdsMap = hotels.reduce(
+        (acc, id) => {
+          acc[id] = true;
 
-      isMatchedHotelId = idKeys.some((key) => key in it && hotels.includes(it[key as keyof UncleanedHotelDataModel] as string));
+          return acc;
+        },
+        {} as Record<string, boolean>,
+      );
+
+      isMatchedHotelId = idKeys.some((key) => key in it && hotelIdsMap[it[key as keyof UncleanedHotelDataModel] as string]);
     }
 
     if (destination) {
@@ -318,6 +331,7 @@ async function getHotelDataBySuppliers(
 
     return mergingData(result);
   } catch (error) {
+    console.trace('- ERROR: Error was found', (error as Error).message);
     throw new Error((error as Error).message);
   }
 }
