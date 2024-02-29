@@ -17,7 +17,7 @@ describe('Supplier Service', () => {
   });
 
   describe('Procurement of Hotel Data', () => {
-    let hotelData: HotelDataBySupplierModel[] = [];
+    let hotelData: ReadonlyArray<HotelDataBySupplierModel> = [];
     const cleanedMockData = CLEANED_HOTEL_MOCK_DATA;
 
     beforeAll(async () => {
@@ -63,7 +63,7 @@ describe('Supplier Service', () => {
   });
 
   describe('Merging of Hotel Data', () => {
-    let hotelData: HotelDataBySupplierModel[] = [];
+    let hotelData: ReadonlyArray<HotelDataBySupplierModel> = [];
     const cleanedHotelData: HotelDataBySupplierModel[] = CLEANED_HOTEL_MOCK_DATA_TEST_MERGING;
 
     beforeAll(async () => {

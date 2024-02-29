@@ -10,7 +10,7 @@ export interface HotelDataBySupplierModel {
   city: string;
   country: string;
   description: string;
-  amenities?: Record<AmenitiesTypeModel, AmenitiesNameModel[]>;
+  amenities?: Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>>;
   images?: Record<ImageTypeModel, ReadonlyArray<ImageModel>>;
   bookingConditions?: ReadonlyArray<string>;
 }

@@ -46,7 +46,7 @@ export interface HotelModel {
     country: string;
   };
   description: string;
-  amenities: Nullable<Record<AmenitiesTypeModel, AmenitiesNameModel[]>>;
+  amenities: Nullable<Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>>>;
   images: Nullable<Record<ImageTypeModel, ReadonlyArray<ImageModel>>>;
   bookingConditions: Nullable<ReadonlyArray<string>>;
 }

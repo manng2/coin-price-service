@@ -9,16 +9,16 @@ function isRedisWorking() {
   return !!client?.isOpen;
 }
 
-async function writeData(key: string, data: any, options: SetOptions, compression: boolean): Promise<void> {
+async function writeData(key: string, data: any, options: SetOptions, isCompressed: boolean): Promise<void> {
   if (isRedisWorking()) {
     let dataToCache = JSON.stringify(data);
-    if (compression) {
+    if (isCompressed) {
       dataToCache = zlib.deflateSync(dataToCache).toString('base64');
     }
 
     try {
-      await client.set(key, dataToCache);
-      console.log('Set new data to ', key);
+      await client.set(key, dataToCache, options);
+      console.log('- INFO: Set new data to ', key);
     } catch (e) {
       console.error(`Failed to cache data for key=${key}`, e);
     }
@@ -29,11 +29,10 @@ async function readData(key: string, compressed: any) {
   let cachedValue = undefined;
   if (isRedisWorking()) {
     cachedValue = await client.get(key);
-    console.log('Read value from key', key);
+    console.log('- INFO: Read value from key', key);
     if (cachedValue) {
-      console.log('---> Founded');
+      console.log('- INFO: Founded value for key', key);
       if (compressed) {
-        // decompress the cached value with ZLIB
         return zlib.inflateSync(Buffer.from(cachedValue, 'base64')).toString();
       } else {
         return cachedValue;
@@ -51,60 +50,49 @@ export async function initializeRedisClient() {
     client = createClient({
       url: redisUrl,
     }).on('error', (error) => {
-      console.error(`Redis client error: ${error}`);
+      console.error(`- ERROR: Redis client error: ${error}`);
     }) as RedisClientType;
 
     try {
-      // connect to the Redis server
       await client.connect();
-      console.log(`Connected to Redis successfully!`);
+      console.log('- INFO: Connected to Redis successfully!');
     } catch (e) {
-      console.error(`Connection to Redis failed with error:`);
-      console.error(e);
+      console.error('Connection to Redis failed with error:', e);
     }
   }
 }
 
 export function redisCacheMiddleware(
   options = {
-    EX: 21600, // 6h
+    EX: 60 * 60 * 6,
   },
-  compression = true,
+  isCompressed = true,
 ) {
   return async (req: Request, res: Response, next: NextFunction) => {
     if (isRedisWorking()) {
       const key = requestToKey(req);
-      // if there is some cached data, retrieve it and return it
-      const cachedValue = await readData(key, compression);
+      const cachedValue = await readData(key, isCompressed);
       if (cachedValue) {
         try {
-          // if it is JSON data, then return it
           return res.json(JSON.parse(cachedValue as unknown as string));
         } catch {
-          // if it is not JSON data, then return it
           return res.send(cachedValue);
         }
       } else {
-        // override how res.send behaves
-        // to introduce the caching logic
         const oldSend = res.send;
         res.send = function (data) {
-          // set the function back to avoid the 'double-send' effect
           res.send = oldSend;
 
-          // cache the response only if it is successful
           if (res.statusCode.toString().startsWith('2')) {
-            writeData(key, data, options, compression).then();
+            writeData(key, data, options, isCompressed).then();
           }
 
           return res.send(data);
         };
 
-        // continue to the controller function
         next();
       }
     } else {
-      // proceed with no caching
       next();
     }
   };

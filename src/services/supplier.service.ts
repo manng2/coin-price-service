@@ -1,20 +1,20 @@
+import axios from 'axios';
 import { defaultGetOption } from '../constants';
 import { defaultAmenities, defaultImages } from '../constants/default-data.constant';
 import {
-  HOTEL_DATA_KEY_DICTIONARY,
   AMENITY_NAME_DICTIONARY,
   AMENITY_TYPE_DICTIONARY,
-  IMAGE_TYPE_DICTIONARY,
-  IMAGE_DATA_KEY_DICTIONARY,
   AMENITY_TYPE_TO_AMENITY_NAME_DICTIONARY,
+  HOTEL_DATA_KEY_DICTIONARY,
+  IMAGE_DATA_KEY_DICTIONARY,
+  IMAGE_TYPE_DICTIONARY,
 } from '../constants/dictionaries.constant';
-import { Nullable } from '../models/core.model';
 import { AmenitiesNameModel, AmenitiesTypeModel, HotelDataBySupplierModel, ImageModel, ImageTypeModel } from '../models';
+import { Nullable } from '../models/core.model';
+import { GetOptionModel } from '../models/get-option.model';
+import { HotelQueryModel } from '../models/hotel.query.model';
 import { UncleanedAmenitiesModel, UncleanedHotelDataModel, UncleanedImageModel, UncleanedImagesModel } from '../models/uncleaned-hotel-data.model';
 import { generateDataMappingFromDictionary } from '../utils';
-import { HotelQueryModel } from '../models/hotel.query.model';
-import { GetOptionModel } from '../models/get-option.model';
-import axios from 'axios';
 
 // TODO: Remove Any
 
@@ -25,14 +25,21 @@ const amenitiesNameToTypeMapping = generateDataMappingFromDictionary<AmenitiesTy
 const imageTypeMapping = generateDataMappingFromDictionary<ImageTypeModel>(IMAGE_TYPE_DICTIONARY);
 const imageFieldMapping = generateDataMappingFromDictionary<keyof ImageModel>(IMAGE_DATA_KEY_DICTIONARY);
 
-function getValueByKey(value: UncleanedHotelDataModel, key: string): null | Object {
+/**
+ * Get value of the key in the uncleaned hotel data model
+ * @param value: Uncleaned Hotel Data Model
+ * @param key: Key of Uncleaned Hotel Data Model, can have format like this: 'a.b.c' to access nested object
+ * @returns Value of the key in the object (might be null if the key is invalid)
+ */
+function getValueByKey(value: UncleanedHotelDataModel, key: string): Nullable<Object> {
   const keys = key.split('.');
   let res = value;
 
   for (const k of keys) {
     if (res && typeof res === 'object' && k in res) {
-      res = res[k as keyof UncleanedHotelDataModel] as any;
+      res = res[k as keyof UncleanedHotelDataModel] as Object;
     } else {
+      console.log('- WARNING: Invalid key', key, 'in', value);
       return null;
     }
   }
@@ -40,6 +47,13 @@ function getValueByKey(value: UncleanedHotelDataModel, key: string): null | Obje
   return res;
 }
 
+/**
+ * Mapping data from uncleaned hotel data model to hotel data by supplier model
+ * @param data: Uncleaned Hotel Data Model
+ * @param key: Key of Uncleaned Hotel Data Model, can have format like this: 'a.b.c' to access nested object
+ * @param newKey: Key of Hotel Data By Supplier Model
+ * @returns Mapped data
+ */
 function mappingData(data: UncleanedHotelDataModel, key: keyof UncleanedHotelDataModel, newKey: keyof HotelDataBySupplierModel): Nullable<Object> {
   switch (newKey) {
     case 'amenities': {
@@ -54,7 +68,7 @@ function mappingData(data: UncleanedHotelDataModel, key: keyof UncleanedHotelDat
   }
 }
 
-function mappingAmenitiesData(amenities?: UncleanedAmenitiesModel): Record<AmenitiesTypeModel, AmenitiesNameModel[]> {
+function mappingAmenitiesData(amenities?: UncleanedAmenitiesModel): Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>> {
   if (!amenities) {
     return {
       [AmenitiesTypeModel.GENERAL]: [],
@@ -136,9 +150,9 @@ function cleaningData(data: UncleanedHotelDataModel): HotelDataBySupplierModel {
 }
 
 function combineAmenitiesData(
-  first: Record<AmenitiesTypeModel, AmenitiesNameModel[]>,
-  second: Record<AmenitiesTypeModel, AmenitiesNameModel[]>,
-): Record<AmenitiesTypeModel, AmenitiesNameModel[]> {
+  first: Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>>,
+  second: Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>>,
+): Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>> {
   const generalMap: Partial<Record<AmenitiesNameModel, boolean>> = {};
   const roomMap: Partial<Record<AmenitiesNameModel, boolean>> = {};
 
@@ -190,7 +204,7 @@ function combineHotelData(first: HotelDataBySupplierModel, second: HotelDataBySu
   };
 }
 
-function mergingData(data: HotelDataBySupplierModel[]): HotelDataBySupplierModel[] {
+function mergingData(data: ReadonlyArray<HotelDataBySupplierModel>): HotelDataBySupplierModel[] {
   const result: Record<string, HotelDataBySupplierModel> = {};
 
   data.forEach((it) => {
@@ -205,7 +219,7 @@ function mergingData(data: HotelDataBySupplierModel[]): HotelDataBySupplierModel
   return Object.values(result);
 }
 
-function filterHotelDataByQuery(data: UncleanedHotelDataModel[], query?: HotelQueryModel): UncleanedHotelDataModel[] {
+function filterHotelDataByQuery(data: ReadonlyArray<UncleanedHotelDataModel>, query?: HotelQueryModel): ReadonlyArray<UncleanedHotelDataModel> {
   const { hotels, destination } = query || {};
 
   return data.filter((it) => {
@@ -228,11 +242,15 @@ function filterHotelDataByQuery(data: UncleanedHotelDataModel[], query?: HotelQu
   });
 }
 
-async function getAllSuppliers(): Promise<string[]> {
+async function getAllSuppliers(): Promise<ReadonlyArray<string>> {
   return new Promise((resolve) => resolve(['acme', 'patagonia', 'paperflies']));
 }
 
-async function getHotelDataBySuppliers(suppliers: string[], query?: HotelQueryModel, options?: GetOptionModel): Promise<HotelDataBySupplierModel[]> {
+async function getHotelDataBySuppliers(
+  suppliers: ReadonlyArray<string>,
+  query?: HotelQueryModel,
+  options?: GetOptionModel,
+): Promise<ReadonlyArray<HotelDataBySupplierModel>> {
   const { batch } = options || defaultGetOption;
   const result: HotelDataBySupplierModel[] = [];
   let size = suppliers.length;
