@@ -68,6 +68,11 @@ function mappingData(data: UncleanedHotelDataModel, key: keyof UncleanedHotelDat
   }
 }
 
+/**
+ * Mapping amenities data from uncleaned amenities model to amenities model
+ * @param amenities: Uncleaned Amenities Model
+ * @returns Mapped amenities data by hotel data by supplier model
+ */
 function mappingAmenitiesData(amenities?: UncleanedAmenitiesModel): Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>> {
   if (!amenities) {
     return {
@@ -104,6 +109,11 @@ function mappingAmenitiesData(amenities?: UncleanedAmenitiesModel): Record<Ameni
   return result;
 }
 
+/**
+ * Mapping images data from uncleaned images model to images model
+ * @param images: Uncleaned Images Model
+ * @returns Mapped images data by hotel data by supplier model
+ */
 function mappingImagesData(images?: UncleanedImagesModel): Record<ImageTypeModel, ReadonlyArray<ImageModel>> {
   if (!images) {
     return {
@@ -135,6 +145,11 @@ function mappingImagesData(images?: UncleanedImagesModel): Record<ImageTypeModel
   return result;
 }
 
+/**
+ * Procuring data - Map from uncleaned hotel data model to hotel data by supplier model
+ * @param data Uncleaned Hotel Data Model
+ * @returns Hotel Data By Supplier Model
+ */
 function cleaningData(data: UncleanedHotelDataModel): HotelDataBySupplierModel {
   const result: Partial<HotelDataBySupplierModel> = {};
 
@@ -149,6 +164,12 @@ function cleaningData(data: UncleanedHotelDataModel): HotelDataBySupplierModel {
   return result as HotelDataBySupplierModel;
 }
 
+/**
+ * Combine amenities data from two hotel data by supplier model
+ * @param first Amenities from first hotel data by supplier model
+ * @param second  Amenities from second hotel data by supplier model
+ * @returns Combined amenities data
+ */
 function combineAmenitiesData(
   first: Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>>,
   second: Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>>,
@@ -167,6 +188,12 @@ function combineAmenitiesData(
   };
 }
 
+/**
+ * Combine images data from two hotel data by supplier model
+ * @param first Images from first hotel data by supplier model
+ * @param second Images from second hotel data by supplier model
+ * @returns Combined images data
+ */
 function combineImagesData(
   first: Record<ImageTypeModel, ReadonlyArray<ImageModel>>,
   second: Record<ImageTypeModel, ReadonlyArray<ImageModel>>,
@@ -185,6 +212,12 @@ function combineImagesData(
   };
 }
 
+/**
+ * Combine booking conditions data from two hotel data by supplier model
+ * @param first Booking conditions from first hotel data by supplier model
+ * @param second Booking conditions from second hotel data by supplier model
+ * @returns Combined booking conditions data
+ */
 function combineBookingConditionsData(first: ReadonlyArray<string>, second: ReadonlyArray<string>): string[] {
   const map: Partial<Record<string, boolean>> = {};
 
@@ -194,6 +227,12 @@ function combineBookingConditionsData(first: ReadonlyArray<string>, second: Read
   return Object.keys(map);
 }
 
+/**
+ * Merging two hotel data by supplier model has the same id
+ * @param first First hotel data by supplier model
+ * @param second Second hotel data by supplier model
+ * @returns Merged hotel data by supplier model
+ */
 function combineHotelData(first: HotelDataBySupplierModel, second: HotelDataBySupplierModel): HotelDataBySupplierModel {
   return {
     ...first,
@@ -204,6 +243,11 @@ function combineHotelData(first: HotelDataBySupplierModel, second: HotelDataBySu
   };
 }
 
+/**
+ * Merging data from multiple hotel data by supplier model by id
+ * @param data Multiple hotel data by supplier model
+ * @returns Merged hotel data by supplier model
+ */
 function mergingData(data: ReadonlyArray<HotelDataBySupplierModel>): HotelDataBySupplierModel[] {
   const result: Record<string, HotelDataBySupplierModel> = {};
 
