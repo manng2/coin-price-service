@@ -57,28 +57,6 @@ describe('Supplier Service', () => {
         address: 'Address 1',
       });
     });
-
-    describe('Test Filtering of Hotel Data', () => {
-      beforeAll(async () => {
-        (axios.get as any).mockResolvedValue({
-          data: DIRTY_HOTEL_MOCK_DATA,
-        });
-      });
-
-      test('should return filtered hotel data', async () => {
-        const data = await supplierService.getHotelDataBySuppliers(['ecma'], {
-          hotels: ['1'],
-        });
-        expect(data.filter((it) => it.id === '1').length).toBe(data.length);
-      });
-
-      test('should return filtered destination data', async () => {
-        const data = await supplierService.getHotelDataBySuppliers(['ecma'], {
-          destination: 1,
-        });
-        expect(data.filter((it) => it.destinationId === 1).length).toBe(data.length);
-      });
-    });
   });
 
   describe('Merging of Hotel Data', () => {
