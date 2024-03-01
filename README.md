@@ -107,24 +107,24 @@ There is 1 API to retrieve hotel data: `GET /hotels`. This API accept following 
 
 Both parameters are **optional**.
 
-We can test this API via [Swagger UI](http://localhost:3000/api-docs/#/default/get_hotels) or using these cURL:
+We can test this API via [Swagger UI](http://13.250.30.193:3000/api-docs/#/default/get_hotels) or using these cURL:
 
 - Retrieving hotel data without filtering 
 ```
-curl -H "Content-Type: application/json" -X GET http://localhost:3000/hotels
+curl -H "Content-Type: application/json" -X GET http://13.250.30.193:3000/hotels
 ```
 
 - Retrieving hotel data with `destination` is `1122`
 ```
-curl -H "Content-Type: application/json" -X GET http://localhost:3000/hotels\?destination\=1122
+curl -H "Content-Type: application/json" -X GET http://13.250.30.193:3000/hotels\?destination\=1122
 ```
 
 - Retrieving hotel data with `hotels` are `iJhz`, `SjyX`
 ```
-curl -H "Content-Type: application/json" -X GET http://localhost:3000/hotels\?hotels\=iJhz,SjyX
+curl -H "Content-Type: application/json" -X GET http://13.250.30.193:3000/hotels\?hotels\=iJhz,SjyX
 ```
 
-*Kindly change http://localhost:3000 with the hostname or IP address of your local server.*
+*Kindly change http://13.250.30.193:3000 with the hostname or IP address of your local server.*
 
 ### API Response
 

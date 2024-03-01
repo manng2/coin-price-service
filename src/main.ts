@@ -2,6 +2,7 @@ import { initializeRedisClient } from './middlewares/redis.middleware';
 import app from './server';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import cors from 'cors';
 
 const port = process.env.PORT || 3000;
 
@@ -19,7 +20,7 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
+        url: 'http://13.250.30.193:3000',
       },
     ],
   },
@@ -28,6 +29,8 @@ const options = {
 
 const specs = swaggerJsdoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+app.use(cors());
 
 initializeRedisClient();
 
