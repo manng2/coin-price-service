@@ -58,7 +58,7 @@
  *     parameters:
  *       - name: hotels
  *         in: query
- *         description: Hotel id
+ *         description: Hotel id (f8c9,3f4e,5f6d)
  *         schema:
  *          type: string
  *       - name: destinationId
