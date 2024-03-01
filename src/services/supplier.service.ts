@@ -228,8 +228,8 @@ function combineImagesAttribute(
 function combineBookingConditionsAttribute(first: ReadonlyArray<string>, second: ReadonlyArray<string>): string[] {
   const map: Partial<Record<string, boolean>> = {};
 
-  first.forEach((it) => (map[it] = true));
-  second.forEach((it) => (map[it] = true));
+  first.forEach((it) => (map[it.trim()] = true));
+  second.forEach((it) => (map[it.trim()] = true));
 
   return Object.keys(map);
 }

@@ -107,7 +107,7 @@ There is 1 API to retrieve hotel data: `GET /hotels`. This API accept following 
 
 Both parameters are **optional**.
 
-We can test this API via [Swagger UI](http://13.250.30.193:3000/api-docs/#/default/get_hotels) or using these cURL:
+We can use these cURLs for testing:
 
 - Retrieving hotel data without filtering 
 ```
@@ -187,5 +187,5 @@ Using GitHub actions, I've created a **YAML** file to trigger GitHub Actions pip
 2. **Lint**: Running lint to check for problematic patterns in code
 
 ### Deployment 🏗️
-To deploy this application, I opted for AWS EC2 (free tier). It only took me **30 minutes** to create an EC2 instance and start serving the application. 🚀🚀🚀
+To deploy this application, I opted for AWS EC2 (free tier). It only took me **30 minutes** to create an EC2 instance and start serving the application. It is live on [`http://13.250.30.193:3000/hotels`](http://13.250.30.193:3000/hotels) 🚀🚀🚀
 
