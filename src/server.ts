@@ -3,7 +3,7 @@ import { hotelRoute } from './routes';
 
 const app: Express = express();
 
-app.use('/hotel', hotelRoute);
+app.use('/hotels', hotelRoute);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server');
