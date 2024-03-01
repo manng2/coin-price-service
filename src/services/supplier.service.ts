@@ -1,19 +1,29 @@
 import axios from 'axios';
-import { defaultGetOption } from '../constants';
-import { defaultAmenities, defaultImages } from '../constants/default-data.constant';
 import {
+  defaultGetOption,
+  defaultAmenities,
+  defaultImages,
   AMENITY_NAME_DICTIONARY,
   AMENITY_TYPE_DICTIONARY,
   AMENITY_TYPE_TO_AMENITY_NAME_DICTIONARY,
   HOTEL_DATA_KEY_DICTIONARY,
   IMAGE_DATA_KEY_DICTIONARY,
   IMAGE_TYPE_DICTIONARY,
-} from '../constants/dictionaries.constant';
-import { AmenitiesNameModel, AmenitiesTypeModel, HotelDataBySupplierModel, ImageModel, ImageTypeModel } from '../models';
-import { Nullable } from '../models/core.model';
-import { GetOptionModel } from '../models/get-option.model';
-import { HotelQueryModel } from '../models/hotel.query.model';
-import { UncleanedAmenitiesModel, UncleanedHotelDataModel, UncleanedImageModel, UncleanedImagesModel } from '../models/uncleaned-hotel-data.model';
+} from '../constants';
+import {
+  AmenitiesNameModel,
+  AmenitiesTypeModel,
+  GetOptionModel,
+  HotelDataBySupplierModel,
+  HotelQueryModel,
+  ImageModel,
+  ImageTypeModel,
+  Nullable,
+  UncleanedAmenitiesModel,
+  UncleanedHotelDataModel,
+  UncleanedImageModel,
+  UncleanedImagesModel,
+} from '../models';
 import { generateDataMappingFromDictionary, getAllKeys } from '../utils';
 
 const hotelFieldMapping = generateDataMappingFromDictionary<keyof HotelDataBySupplierModel>(HOTEL_DATA_KEY_DICTIONARY);
@@ -225,6 +235,26 @@ function combineBookingConditionsAttribute(first: ReadonlyArray<string>, second:
 }
 
 /**
+ * Combine name data from two hotel data by supplier model
+ * @param first Name data from first hotel data by supplier model
+ * @param second Name data from second hotel data by supplier model
+ * @returns Combined name data
+ */
+function combineNameAttribute(first: string, second: string): string {
+  return first.length > second.length ? first : second;
+}
+
+/**
+ * Combine address data from two hotel data by supplier model
+ * @param first Address data from first hotel data by supplier model
+ * @param second Address data from second hotel data by supplier model
+ * @returns Combined address data
+ */
+function combineAddressAttribute(first: string, second: string): string {
+  return first.length > second.length ? first : second;
+}
+
+/**
  * Merging two hotel data by supplier model has the same id
  * @param first First hotel data by supplier model
  * @param second Second hotel data by supplier model
@@ -234,6 +264,8 @@ function combineAttributes(first: HotelDataBySupplierModel, second: HotelDataByS
   return {
     ...first,
     ...second,
+    address: combineAddressAttribute(first.address || '', second.address || ''),
+    name: combineNameAttribute(first.name || '', second.name || ''),
     amenities: combineAmenitiesAttribute(first.amenities || defaultAmenities, second.amenities || defaultAmenities),
     images: combineImagesAttribute(first.images || defaultImages, second.images || defaultImages),
     bookingConditions: combineBookingConditionsAttribute(first.bookingConditions || [], second.bookingConditions || []),

@@ -1,4 +1,4 @@
-import { Nullable } from './core.model';
+import { Nullable } from './nullable.model';
 
 export enum ImageTypeModel {
   ROOM = 'rooms',
@@ -32,6 +32,21 @@ export enum AmenitiesNameModel {
   CHILDCARE = 'childcare',
   COFFEE_MACHINE = 'coffeeMachine',
   IRON = 'iron',
+}
+
+export interface HotelDataBySupplierModel {
+  id: string;
+  destinationId: number;
+  lat: number;
+  lng: number;
+  city: string;
+  country: string;
+  description: string;
+  name?: string;
+  address?: string;
+  amenities?: Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>>;
+  images?: Record<ImageTypeModel, ReadonlyArray<ImageModel>>;
+  bookingConditions?: ReadonlyArray<string>;
 }
 
 export interface HotelModel {
