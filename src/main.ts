@@ -4,6 +4,8 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
 
+app.use(cors());
+
 const port = process.env.PORT || 3000;
 
 const options = {
@@ -30,10 +32,8 @@ const options = {
 const specs = swaggerJsdoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
-app.use(cors());
-
 initializeRedisClient();
 
 app.listen(port, () => {
-  console.log(`[server]: Server is running at http:/c/localhost:${port}`);
+  console.log(`[server]: Server is running at http://localhost:${port}`);
 });
