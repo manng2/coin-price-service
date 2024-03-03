@@ -1,5 +1,3 @@
-import { Nullable } from './nullable.model';
-
 export enum ImageTypeModel {
   ROOM = 'rooms',
   AMENITY = 'amenity',
@@ -42,17 +40,14 @@ export interface HotelDataBySupplierModel {
   city: string;
   country: string;
   description: string;
-  name?: string;
+  name: string;
   address?: string;
   amenities?: Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>>;
   images?: Record<ImageTypeModel, ReadonlyArray<ImageModel>>;
   bookingConditions?: ReadonlyArray<string>;
 }
 
-export interface HotelModel {
-  id: string;
-  destinationId: number;
-  name: string;
+export interface HotelModel extends Omit<HotelDataBySupplierModel, 'lat' | 'lng' | 'city' | 'address' | 'city' | 'country'> {
   location: {
     lat: number;
     lng: number;
@@ -60,8 +55,4 @@ export interface HotelModel {
     city: string;
     country: string;
   };
-  description: string;
-  amenities: Nullable<Record<AmenitiesTypeModel, ReadonlyArray<AmenitiesNameModel>>>;
-  images: Nullable<Record<ImageTypeModel, ReadonlyArray<ImageModel>>>;
-  bookingConditions: Nullable<ReadonlyArray<string>>;
 }
