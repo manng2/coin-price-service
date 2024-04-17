@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { chartLogs } from '../utils/db-client.util';
 import { generateChartKey } from '../utils/generate-chart-key.util';
+import { convertToNewFormat } from '../utils/convert-old-format-to-new-format.util';
 
 // interface ChartLog {
 //   _id: string;
@@ -37,7 +38,7 @@ function generateH1ChartData(data: any) {
   });
 
   return {
-    data: Object.values(rangeMap).sort((a, b) => a.Date - b.Date),
+    data: convertToNewFormat(Object.values(rangeMap).sort((a, b) => a.Date - b.Date)),
     lastReadTime: data[data.length - 1].time,
   };
 }
@@ -71,7 +72,7 @@ export function generateD1ChartData(data: any) {
   });
 
   return {
-    data: Object.values(rangeMap).sort((a, b) => a.Date - b.Date),
+    data: convertToNewFormat(Object.values(rangeMap).sort((a, b) => a.Date - b.Date)),
     lastReadTime: data[data.length - 1].time,
   };
 }
@@ -105,7 +106,7 @@ export function generateH4ChartData(data: any) {
   });
 
   return {
-    data: Object.values(rangeMap).sort((a, b) => a.Date - b.Date),
+    data: convertToNewFormat(Object.values(rangeMap).sort((a, b) => a.Date - b.Date)),
     lastReadTime: data[data.length - 1].time,
   };
 }
