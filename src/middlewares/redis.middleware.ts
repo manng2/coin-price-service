@@ -11,7 +11,7 @@ function isRedisWorking() {
 
 async function writeData(key: string, data: any, options: SetOptions, isCompressed: boolean): Promise<void> {
   if (isRedisWorking()) {
-    let dataToCache = JSON.stringify(data);
+    let dataToCache = data;
     if (isCompressed) {
       dataToCache = zlib.deflateSync(dataToCache).toString('base64');
     }

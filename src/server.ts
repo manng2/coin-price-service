@@ -1,9 +1,9 @@
 import express, { Express, Request, Response } from 'express';
-import { hotelRoute } from './routes';
+import { priceRoute } from './routes';
 
 const app: Express = express();
 
-app.use('/hotels', hotelRoute);
+app.use('/price', priceRoute);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server');
