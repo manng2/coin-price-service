@@ -1,7 +1,7 @@
 import express from 'express';
-import { getPrice } from '../controllers/price.controller';
-import { redisCacheMiddleware } from '../middlewares/redis.middleware';
+import { getLatestPrice } from '../controllers/price.controller';
 
 export const priceRoute = express.Router();
 
-priceRoute.get('/', redisCacheMiddleware(), getPrice);
+// priceRoute.get('/', redisCacheMiddleware(), getPrice);
+priceRoute.get('/new', getLatestPrice);
