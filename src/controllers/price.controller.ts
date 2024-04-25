@@ -52,7 +52,7 @@ export async function getLatestPrice(req: Request, res: Response) {
     const { data } = JSON.parse(jsonData);
 
     // Send the JSON data as a response
-    return res.status(200).json(data[0]);
+    return res.status(200).json(data[data.length - 1]);
   } catch (error) {
     console.error('Error reading or parsing JSON file:', error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -108,6 +108,25 @@ export async function updateJsonData(req: Request, res: Response) {
   });
 
   res.status(200);
+}
+
+export function getJsonData(req: Request, res: Response) {
+  const { chart } = req.query;
+  const filePath = `src/public/${(chart as string).toLowerCase()}.json`;
+
+  try {
+    // Read JSON data from file
+    const jsonData = fs.readFileSync(filePath, 'utf8');
+
+    // Parse JSON data
+    const { data } = JSON.parse(jsonData);
+
+    // Send the JSON data as a response
+    return res.status(200).json(data);
+  } catch (error) {
+    console.error('Error reading or parsing JSON file:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 }
 
 async function getAllRecords() {
