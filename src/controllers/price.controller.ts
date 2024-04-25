@@ -49,10 +49,22 @@ export async function getLatestPrice(req: Request, res: Response) {
     const jsonData = fs.readFileSync(filePath, 'utf8');
 
     // Parse JSON data
-    const { data } = JSON.parse(jsonData);
+    const { lastReadIdx } = JSON.parse(jsonData);
+    const latestRecords = await chartLogs
+      .find({})
+      .skip(lastReadIdx + 1)
+      .toArray();
+
+    if (!latestRecords.length) {
+      return res.status(200).json([]);
+    }
+
+    const latestChartData = (
+      chart === 'h1' ? generateH1ChartData(latestRecords) : chart === 'h4' ? generateH4ChartData(latestRecords) : generateD1ChartData(latestRecords)
+    ).data;
 
     // Send the JSON data as a response
-    return res.status(200).json(data[data.length - 1]);
+    return res.status(200).json(latestChartData[latestChartData.length - 1]);
   } catch (error) {
     console.error('Error reading or parsing JSON file:', error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -132,7 +144,7 @@ export function getJsonData(req: Request, res: Response) {
 async function getAllRecords() {
   const pageSize = 1000; // Number of records to fetch per page
   let page = 1;
-  let allRecords: any[] = [];
+  const allRecords: any[] = [];
   const alwaysTrue = true;
 
   while (alwaysTrue) {
@@ -146,7 +158,10 @@ async function getAllRecords() {
       break; // No more records found
     }
 
-    allRecords = [...records, ...allRecords];
+    for (const record of records) {
+      allRecords.push(record);
+    }
+
     page++;
   }
 
