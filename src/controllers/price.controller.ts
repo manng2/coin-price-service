@@ -4,6 +4,7 @@ import { generateD1ChartData, generateH1ChartData, generateH4ChartData } from '.
 import { chartLogs } from '../utils/db-client.util';
 import { generateChartKey } from '../utils/generate-chart-key.util';
 import { getLastReadIdxAndData } from '../utils/get-latest-read-idx-and-data.util';
+import { mergeData } from '../utils/merge-data.util';
 
 // interface ChartLog {
 //   _id: string;
@@ -78,17 +79,25 @@ export async function updateJsonData(req: Request, res: Response) {
   const h4FilePath = 'src/public/h4.json';
   const d1FilePath = 'src/public/d1.json';
 
+  const { data: oldDataH1 } = getLastReadIdxAndData('h1');
+
   const h1ChartData = {
     lastReadIdx: lastIdx,
-    data: generateH1ChartData(data).data,
+    data: mergeData(oldDataH1, generateH1ChartData(data).data, 'h1'),
   };
+
+  const { data: oldDataH4 } = getLastReadIdxAndData('h4');
+
   const h4ChartData = {
     lastReadIdx: lastIdx,
-    data: generateH4ChartData(data).data,
+    data: mergeData(oldDataH4, generateH4ChartData(data).data, 'h4'),
   };
+
+  const { data: oldDataD1 } = getLastReadIdxAndData('d1');
+
   const d1ChartData = {
     lastReadIdx: lastIdx,
-    data: generateD1ChartData(data).data,
+    data: mergeData(oldDataD1, generateD1ChartData(data).data, 'd1'),
   };
 
   fs.writeFile(h1FilePath, JSON.stringify(h1ChartData), (err) => {
@@ -159,7 +168,7 @@ function updateLatestCandleByChartType(type: 'h1' | 'h4' | 'd1', time: number, p
   if (key === lastDataKey) {
     const [timestamp, open, high, low] = data[data.length - 1];
 
-    data[data.length - 1] = [timestamp, open, String(Math.min(Number(low), price)), String(Math.max(Number(high), price)), String(price)];
+    data[data.length - 1] = [timestamp, open, String(Math.max(Number(high), price)), String(Math.min(Number(low), price)), String(price)];
   } else {
     const date = new Date(time);
     date.setMinutes(0);
@@ -188,12 +197,14 @@ function updateLatestCandleByChartType(type: 'h1' | 'h4' | 'd1', time: number, p
 }
 
 async function getAllRecords() {
+  const { lastReadIdx } = getLastReadIdxAndData('h1');
   const pageSize = 1000; // Number of records to fetch per page
-  let lastIdx = 0;
+  let lastIdx = lastReadIdx ? lastReadIdx + 1 : 0;
+  const MAX_READ_RECORDS = 1000000;
   const allRecords: any[] = [];
   const alwaysTrue = true;
 
-  while (alwaysTrue) {
+  while (alwaysTrue && allRecords.length < MAX_READ_RECORDS) {
     console.log(`[Page: ${Math.round(lastIdx / pageSize)}, Index: ${lastIdx}, Total Records: ${allRecords.length}] Fetching...`);
     const records = await chartLogs.find({}).skip(lastIdx).limit(pageSize).toArray();
 
