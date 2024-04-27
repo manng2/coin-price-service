@@ -3,6 +3,13 @@ import { generateChartKey } from './generate-chart-key.util';
 
 export function generateH1ChartData(data: any) {
   const rangeMap: Record<string, any> = {};
+  if (data.length === 0) {
+    return {
+      data: [],
+      lastReadTime: 0,
+    };
+  }
+
   data.forEach((it: any) => {
     const key = generateChartKey(it.time, 'h1') as string;
 
@@ -37,6 +44,13 @@ export function generateH1ChartData(data: any) {
 
 export function generateD1ChartData(data: any) {
   const rangeMap: Record<string, any> = {};
+  if (data.length === 0) {
+    return {
+      data: [],
+      lastReadTime: 0,
+    };
+  }
+
   data.forEach((it: any) => {
     const key = generateChartKey(it.time, 'd1');
 
@@ -71,6 +85,13 @@ export function generateD1ChartData(data: any) {
 
 export function generateH4ChartData(data: any) {
   const rangeMap: Record<string, any> = {};
+  if (data.length === 0) {
+    return {
+      data: [],
+      lastReadTime: 0,
+    };
+  }
+
   data.forEach((it: any) => {
     const key = generateChartKey(it.time, 'h4');
 

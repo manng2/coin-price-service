@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import fs from 'fs';
 import { generateD1ChartData, generateH1ChartData, generateH4ChartData } from '../utils';
 import { chartLogs } from '../utils/db-client.util';
+import { generateChartKey } from '../utils/generate-chart-key.util';
+import { getLastReadIdxAndData } from '../utils/get-latest-read-idx-and-data.util';
 
 // interface ChartLog {
 //   _id: string;
@@ -49,22 +51,10 @@ export async function getLatestPrice(req: Request, res: Response) {
     const jsonData = fs.readFileSync(filePath, 'utf8');
 
     // Parse JSON data
-    const { lastReadIdx } = JSON.parse(jsonData);
-    const latestRecords = await chartLogs
-      .find({})
-      .skip(lastReadIdx + 1)
-      .toArray();
-
-    if (!latestRecords.length) {
-      return res.status(200).json([]);
-    }
-
-    const latestChartData = (
-      chart === 'h1' ? generateH1ChartData(latestRecords) : chart === 'h4' ? generateH4ChartData(latestRecords) : generateD1ChartData(latestRecords)
-    ).data;
+    const { data } = JSON.parse(jsonData);
 
     // Send the JSON data as a response
-    return res.status(200).json(latestChartData[latestChartData.length - 1]);
+    return res.status(200).json(data[data.length - 1]);
   } catch (error) {
     console.error('Error reading or parsing JSON file:', error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -73,25 +63,31 @@ export async function getLatestPrice(req: Request, res: Response) {
 
 export async function updateJsonData(req: Request, res: Response) {
   const startFetchingTime = performance.now();
-  const data = await getAllRecords();
+  const { data, lastIdx } = await getAllRecords();
   const endFetchingTime = performance.now();
 
-  console.log(`Total time to finish task: ${((endFetchingTime - startFetchingTime) / 1000).toFixed(2)} seconds`);
+  console.log(`Total time to finish task: ${((endFetchingTime - startFetchingTime) / 1000).toFixed(2)} seconds with ${data.length} records`);
+
+  if (data.length === 0) {
+    return res.status(200).json({
+      message: 'No new records',
+    });
+  }
 
   const h1FilePath = 'src/public/h1.json';
   const h4FilePath = 'src/public/h4.json';
   const d1FilePath = 'src/public/d1.json';
 
   const h1ChartData = {
-    lastReadIdx: data.length - 1,
+    lastReadIdx: lastIdx,
     data: generateH1ChartData(data).data,
   };
   const h4ChartData = {
-    lastReadIdx: data.length - 1,
+    lastReadIdx: lastIdx,
     data: generateH4ChartData(data).data,
   };
   const d1ChartData = {
-    lastReadIdx: data.length - 1,
+    lastReadIdx: lastIdx,
     data: generateD1ChartData(data).data,
   };
 
@@ -119,7 +115,9 @@ export async function updateJsonData(req: Request, res: Response) {
     }
   });
 
-  res.status(200);
+  return res.status(200).json({
+    message: 'Updated successfully',
+  });
 }
 
 export function getJsonData(req: Request, res: Response) {
@@ -141,29 +139,77 @@ export function getJsonData(req: Request, res: Response) {
   }
 }
 
+export function updateLatestCandle(req: Request, res: Response) {
+  const { time, price } = req.body;
+  updateLatestCandleByChartType('h1', time, price);
+  updateLatestCandleByChartType('h4', time, price);
+  updateLatestCandleByChartType('d1', time, price);
+
+  return res.status(200).json({
+    message: 'Updated successfully',
+  });
+}
+
+function updateLatestCandleByChartType(type: 'h1' | 'h4' | 'd1', time: number, price: number) {
+  const key = generateChartKey(time, type);
+  const { lastReadIdx, data } = getLastReadIdxAndData(type);
+  const lastDataKey = generateChartKey(data[data.length - 1][0], type);
+  const filePath = `src/public/${type}.json`;
+
+  if (key === lastDataKey) {
+    const [timestamp, open, high, low] = data[data.length - 1];
+
+    data[data.length - 1] = [timestamp, open, String(Math.min(Number(low), price)), String(Math.max(Number(high), price)), String(price)];
+  } else {
+    const date = new Date(time);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    const priceStr = String(price);
+
+    const newData = [date.getTime(), priceStr, priceStr, priceStr, priceStr];
+    data.push(newData);
+  }
+
+  fs.writeFile(
+    filePath,
+    JSON.stringify({
+      lastReadIdx: lastReadIdx + 1,
+      data,
+    }),
+    (err) => {
+      if (err) {
+        console.error('Error writing JSON to file:', err);
+      } else {
+        console.log(`${type} Chart Data has been written to the file successfully.`);
+      }
+    },
+  );
+}
+
 async function getAllRecords() {
   const pageSize = 1000; // Number of records to fetch per page
-  let page = 1;
+  let lastIdx = 0;
   const allRecords: any[] = [];
   const alwaysTrue = true;
 
   while (alwaysTrue) {
-    console.log(`[Page: ${page}, Total Records: ${allRecords.length}] Fetched`);
-    const records = await chartLogs
-      .find({})
-      .skip((page - 1) * pageSize)
-      .limit(pageSize)
-      .toArray();
+    console.log(`[Page: ${Math.round(lastIdx / pageSize)}, Index: ${lastIdx}, Total Records: ${allRecords.length}] Fetching...`);
+    const records = await chartLogs.find({}).skip(lastIdx).limit(pageSize).toArray();
+
     if (records.length === 0) {
-      break; // No more records found
+      break;
     }
 
     for (const record of records) {
       allRecords.push(record);
     }
 
-    page++;
+    lastIdx += pageSize;
   }
 
-  return allRecords;
+  return {
+    data: allRecords,
+    lastIdx: lastIdx - 1,
+  };
 }
