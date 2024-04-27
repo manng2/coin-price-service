@@ -54,7 +54,7 @@ export async function getLatestPrice(req: Request, res: Response) {
     const { data } = JSON.parse(jsonData);
 
     // Send the JSON data as a response
-    return res.status(200).json(data[data.length - 1]);
+    return res.status(200).json([data[data.length - 1]]);
   } catch (error) {
     console.error('Error reading or parsing JSON file:', error);
     return res.status(500).json({ error: 'Internal server error' });
