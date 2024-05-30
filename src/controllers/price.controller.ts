@@ -12,36 +12,36 @@ import { mergeData } from '../utils/merge-data.util';
 //   value: number;
 // }
 
-export async function getPrice(req: Request, res: Response) {
-  const { chart } = req.query;
-  const data = await chartLogs.find({}).toArray();
-  let ans: any;
+// export async function getPrice(req: Request, res: Response) {
+//   const { chart } = req.query;
+//   const data = await chartLogs.find({}).toArray();
+//   let ans: any;
 
-  switch (chart) {
-    case 'h1': {
-      ans = generateH1ChartData(data).data;
+//   switch (chart) {
+//     case 'h1': {
+//       ans = generateH1ChartData(data).data;
 
-      break;
-    }
-    case 'h4': {
-      ans = generateH4ChartData(data).data;
+//       break;
+//     }
+//     case 'h4': {
+//       ans = generateH4ChartData(data).data;
 
-      break;
-    }
-    case 'd1': {
-      ans = generateD1ChartData(data).data;
+//       break;
+//     }
+//     case 'd1': {
+//       ans = generateD1ChartData(data).data;
 
-      break;
-    }
-    default: {
-      ans = generateD1ChartData(data).data;
+//       break;
+//     }
+//     default: {
+//       ans = generateD1ChartData(data).data;
 
-      break;
-    }
-  }
+//       break;
+//     }
+//   }
 
-  return res.status(200).json(ans);
-}
+//   return res.status(200).json(ans);
+// }
 
 export async function getLatestPrice(req: Request, res: Response) {
   const { chart } = req.query;
@@ -78,6 +78,9 @@ export async function updateJsonData(req: Request, res: Response) {
   const h1FilePath = 'src/public/h1.json';
   const h4FilePath = 'src/public/h4.json';
   const d1FilePath = 'src/public/d1.json';
+  const m1FilePath = 'src/public/m1.json';
+  const m5FilePath = 'src/public/m5.json';
+  const m15FilePath = 'src/public/m15.json';
 
   const { data: oldDataH1 } = getLastReadIdxAndData('h1');
 
@@ -98,6 +101,27 @@ export async function updateJsonData(req: Request, res: Response) {
   const d1ChartData = {
     lastReadIdx: lastIdx,
     data: mergeData(oldDataD1, generateD1ChartData(data).data, 'd1'),
+  };
+
+  const { data: oldDataM1 } = getLastReadIdxAndData('m1');
+
+  const m1ChartData = {
+    lastReadIdx: lastIdx,
+    data: mergeData(oldDataM1, generateD1ChartData(data).data, 'm1'),
+  };
+
+  const { data: oldDataM5 } = getLastReadIdxAndData('m5');
+
+  const m5ChartData = {
+    lastReadIdx: lastIdx,
+    data: mergeData(oldDataM5, generateD1ChartData(data).data, 'm5'),
+  };
+
+  const { data: oldDataM15 } = getLastReadIdxAndData('m15');
+
+  const m15ChartData = {
+    lastReadIdx: lastIdx,
+    data: mergeData(oldDataM15, generateD1ChartData(data).data, 'm15'),
   };
 
   fs.writeFile(h1FilePath, JSON.stringify(h1ChartData), (err) => {
@@ -121,6 +145,30 @@ export async function updateJsonData(req: Request, res: Response) {
       console.error('Error writing JSON to file:', err);
     } else {
       console.log('D1 Chart Data has been written to the file successfully.');
+    }
+  });
+
+  fs.writeFile(m1FilePath, JSON.stringify(m1ChartData), (err) => {
+    if (err) {
+      console.error('Error writing JSON to file:', err);
+    } else {
+      console.log('M1 Chart Data has been written to the file successfully.');
+    }
+  });
+
+  fs.writeFile(m5FilePath, JSON.stringify(m5ChartData), (err) => {
+    if (err) {
+      console.error('Error writing JSON to file:', err);
+    } else {
+      console.log('M5 Chart Data has been written to the file successfully.');
+    }
+  });
+
+  fs.writeFile(m15FilePath, JSON.stringify(m15ChartData), (err) => {
+    if (err) {
+      console.error('Error writing JSON to file:', err);
+    } else {
+      console.log('M15 Chart Data has been written to the file successfully.');
     }
   });
 
@@ -153,13 +201,16 @@ export function updateLatestCandle(req: Request, res: Response) {
   updateLatestCandleByChartType('h1', time, price);
   updateLatestCandleByChartType('h4', time, price);
   updateLatestCandleByChartType('d1', time, price);
+  updateLatestCandleByChartType('m1', time, price);
+  updateLatestCandleByChartType('m5', time, price);
+  updateLatestCandleByChartType('m15', time, price);
 
   return res.status(200).json({
     message: 'Updated successfully',
   });
 }
 
-function updateLatestCandleByChartType(type: 'h1' | 'h4' | 'd1', time: number, price: number) {
+function updateLatestCandleByChartType(type: 'h1' | 'h4' | 'd1' | 'm1' | 'm5' | 'm15', time: number, price: number) {
   const key = generateChartKey(time, type);
   const { lastReadIdx, data } = getLastReadIdxAndData(type);
   const lastDataKey = generateChartKey(data[data.length - 1][0], type);

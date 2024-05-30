@@ -3,7 +3,7 @@ import { generateChartKey } from './generate-chart-key.util';
 /**
  * Merge data with format [Time, Open, High, Low, Close]
  */
-export function mergeData(oldData: any, data: any, type: 'h1' | 'h4' | 'd1'): any {
+export function mergeData(oldData: any, data: any, type: 'h1' | 'h4' | 'd1' | 'm1' | 'm5' | 'm15'): any {
   if (oldData.length === 0) {
     return data;
   }

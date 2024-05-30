@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-export function getLastReadIdxAndData(type: 'h1' | 'h4' | 'd1'): {
+export function getLastReadIdxAndData(type: 'h1' | 'h4' | 'd1' | 'm1' | 'm5' | 'm15'): {
   lastReadIdx: number;
   data: any;
 } {

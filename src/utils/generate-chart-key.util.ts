@@ -1,4 +1,4 @@
-export function generateChartKey(timestamp: number, type: 'h1' | 'h4' | 'd1'): string {
+export function generateChartKey(timestamp: number, type: 'h1' | 'h4' | 'd1' | 'm1' | 'm5' | 'm15'): string {
   const date = new Date(timestamp);
 
   switch (type) {
@@ -39,6 +39,38 @@ export function generateChartKey(timestamp: number, type: 'h1' | 'h4' | 'd1'): s
       const year = date.getFullYear().toString().slice(-2); // Get last two digits of the year
 
       return `${day}${month}${year}`;
+    }
+
+    case 'm1': {
+      const day = ('0' + date.getDate()).slice(-2); // Get day with leading zero
+      const month = ('0' + (date.getMonth() + 1)).slice(-2); // Get month with leading zero
+      const year = date.getFullYear().toString().slice(-2); // Get last two digits of the year
+      const hour = ('0' + date.getHours()).slice(-2); // Get hour with leading zero
+      const minute = ('0' + date.getMinutes()).slice(-2); // Get minute with leading zero
+
+      return `${day}${month}${year}${hour}${minute}`;
+    }
+
+    case 'm5': {
+      const day = ('0' + date.getDate()).slice(-2); // Get day with leading zero
+      const month = ('0' + (date.getMonth() + 1)).slice(-2); // Get month with leading zero
+      const year = date.getFullYear().toString().slice(-2); // Get last two digits of the year
+      const hour = ('0' + date.getHours()).slice(-2); // Get hour with leading zero
+      const minute = date.getMinutes();
+      const minuteGroup = Math.floor(minute / 5); // Group by 5 minutes
+
+      return `${day}${month}${year}${hour}${minuteGroup}`;
+    }
+
+    case 'm15': {
+      const day = ('0' + date.getDate()).slice(-2); // Get day with leading zero
+      const month = ('0' + (date.getMonth() + 1)).slice(-2); // Get month with leading zero
+      const year = date.getFullYear().toString().slice(-2); // Get last two digits of the year
+      const hour = ('0' + date.getHours()).slice(-2); // Get hour with leading zero
+      const minute = date.getMinutes();
+      const minuteGroup = Math.floor(minute / 15); // Group by 15 minutes
+
+      return `${day}${month}${year}${hour}${minuteGroup}`;
     }
 
     default:

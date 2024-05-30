@@ -1,6 +1,13 @@
 import fs from 'fs';
 import app from './server';
-import { generateD1ChartData, generateH1ChartData, generateH4ChartData } from './utils';
+import {
+  generateD1ChartData,
+  generateH1ChartData,
+  generateH4ChartData,
+  generateM15ChartData,
+  generateM1ChartData,
+  generateM5ChartData,
+} from './utils';
 import { chartLogs, initMongoDBClient } from './utils/db-client.util';
 import { getLastReadIdxAndData } from './utils/get-latest-read-idx-and-data.util';
 
@@ -49,13 +56,31 @@ initMongoDBClient(uri).then(async () => {
 
 async function updateLatestDataByLastReadIdx(data: any): Promise<void> {
   console.log(`Outdated data, generating latest Chart Data...`);
-  return Promise.all([updateNewData('h1', data), updateNewData('h4', data), updateNewData('d1', data)]).then();
+  return Promise.all([
+    updateNewData('h1', data),
+    updateNewData('h4', data),
+    updateNewData('d1', data),
+    updateNewData('m1', data),
+    updateNewData('m5', data),
+    updateNewData('m15', data),
+  ]).then();
 }
 
-function updateNewData(type: 'h1' | 'h4' | 'd1', data: any): Promise<void> {
+function updateNewData(type: 'h1' | 'h4' | 'd1' | 'm1' | 'm5' | 'm15', data: any): Promise<void> {
   return new Promise((resolve, reject) => {
     const { lastReadIdx, data: oldData } = getLastReadIdxAndData(type);
-    const genFn = type === 'h1' ? generateH1ChartData : type === 'h4' ? generateH4ChartData : generateD1ChartData;
+    const genFn =
+      type === 'h1'
+        ? generateH1ChartData
+        : type === 'h4'
+          ? generateH4ChartData
+          : type === 'm1'
+            ? generateM1ChartData
+            : type === 'm5'
+              ? generateM5ChartData
+              : type === 'm15'
+                ? generateM15ChartData
+                : generateD1ChartData;
     const newChartData = genFn(data).data;
     const filePath = `src/public/${type}.json`;
 
