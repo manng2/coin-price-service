@@ -10,29 +10,53 @@ import {
 } from './utils';
 import { chartLogs, initMongoDBClient } from './utils/db-client.util';
 import { getLastReadIdxAndData } from './utils/get-latest-read-idx-and-data.util';
+import { updateLatestCandleByChartType } from './utils/update-latest-candle-by-chart-type.util';
 
 const port = process.env.PORT || 3000;
 const uri = 'mongodb+srv://mannguyen:ECEvPdeEHCguvD3V@cluster0.ckbyr09.mongodb.net/?retryWrites=true&w=majority';
-const MAX_READ_RECORDS = 300000;
+// const MAX_READ_RECORDS = 300000;
 // initializeRedisClient();
 
 initMongoDBClient(uri).then(async () => {
   const { lastReadIdx, data: oldData } = getLastReadIdxAndData('h1');
+  let continueReadIdx = lastReadIdx + 1;
 
   // Only running prefetching if there is data
   if (oldData.length) {
     const data = await chartLogs
       .find({})
       .skip(lastReadIdx ? lastReadIdx + 1 : 0)
-      .limit(MAX_READ_RECORDS)
+      // Limit ở đây đề phòng thiếu quá nhiều data dẫn đến crash
+      // .limit(MAX_READ_RECORDS)
       .toArray();
 
     if (data.length) {
+      continueReadIdx += data.length;
       await updateLatestDataByLastReadIdx(data);
     } else {
       console.log('Congrats! Data is cleaned or latest');
     }
   }
+
+  // setInterval to read new data
+  setInterval(async () => {
+    const data = (await chartLogs.find({}).skip(continueReadIdx).toArray())[0];
+
+    if (data) {
+      console.log(`✅ Found new chart log since ${continueReadIdx - 1}`);
+
+      const { time, value: price } = data;
+
+      updateLatestCandleByChartType('h1', time, price);
+      updateLatestCandleByChartType('h4', time, price);
+      updateLatestCandleByChartType('d1', time, price);
+      updateLatestCandleByChartType('m1', time, price);
+      updateLatestCandleByChartType('m5', time, price);
+      updateLatestCandleByChartType('m15', time, price);
+    } else {
+      console.log(`⛔ No new chart log since ${continueReadIdx - 1}`);
+    }
+  }, 2000);
 
   app.listen(port, async () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
