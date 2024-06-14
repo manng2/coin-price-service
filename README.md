@@ -72,7 +72,8 @@ The response format is like below:
 
 ### Initialization
 
-1. At the beginning, we call `GET /updateJsonData`
+1. At the beginning, running `npm run migration`
+2. When it is finished, start running project: `npm run dev`
 
 ### Data flow
 1. Init MongoDB Client and check the last read index data in `h1.json` whether or not has old data.
