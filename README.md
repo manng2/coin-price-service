@@ -69,3 +69,20 @@ The response format is like below:
 ```
 ### Optimization 🚀
 - For **faster reading**, I utilize **Redis** for caching data, resulting in a reduction of **200 times** in read times (on my local machine).
+
+### Initialization
+
+1. At the beginning, we call `GET /updateJsonData`
+
+### Data flow
+1. Init MongoDB Client and check the last read index data in `h1.json` whether or not has old data.
+
+2. If already had old data, we query from `chartLogs` start at `lastReadIdx` that we saved before.
+
+3. If there are new data after `lastReadIdx`, we start update new data to `h1`, `h4`, `d1`, `m1`, `m5`, `m15` json files.
+
+4. Start `setInterval` to read new data (from new `lastReadIdx`) every `2s` and update to json files.
+
+### Constraints
+
+1. Can init `10^6` with chart logs records only.

@@ -2,6 +2,9 @@ import express, { Express, Request, Response } from 'express';
 import { priceRoute } from './routes';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app: Express = express();
 

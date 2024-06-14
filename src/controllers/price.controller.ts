@@ -249,9 +249,9 @@ export function updateLatestCandle(req: Request, res: Response) {
 
 async function getAllRecords() {
   const { lastReadIdx } = getLastReadIdxAndData('h1');
-  const pageSize = 1000; // Number of records to fetch per page
+  const pageSize = Number(process.env.PAGE_SIZE) || 1000; // Number of records to fetch per page
   let lastIdx = lastReadIdx ? lastReadIdx + 1 : 0;
-  const MAX_READ_RECORDS = 1000000;
+  const MAX_READ_RECORDS = Number(process.env.MAX_READ_RECORDS) || 1000000;
   const allRecords: any[] = [];
   const alwaysTrue = true;
 
