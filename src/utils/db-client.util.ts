@@ -9,7 +9,7 @@ export async function initMongoDBClient(uri: string): Promise<void> {
   await dbClient
     .connect()
     .then(() => {
-      const db = dbClient.db('test');
+      const db = dbClient.db('coin-price-serice');
       console.log('Connected Database');
 
       chartLogs = db.collection('chart_logs');

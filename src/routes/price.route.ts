@@ -9,4 +9,4 @@ priceRoute.post('/new', updateLatestCandle);
 priceRoute.get('/json', getJsonData);
 
 // Write Json data from beginning
-priceRoute.get('/updateJsonData', updateJsonData);
+// priceRoute.get('/updateJsonData', updateJsonData);

@@ -13,7 +13,7 @@ import { getLastReadIdxAndData } from './utils/get-latest-read-idx-and-data.util
 import { updateLatestCandleByChartType } from './utils/update-latest-candle-by-chart-type.util';
 
 const port = process.env.PORT || 3000;
-const uri = 'mongodb+srv://mannguyen:ECEvPdeEHCguvD3V@cluster0.ckbyr09.mongodb.net/?retryWrites=true&w=majority';
+const uri = 'mongodb+srv://mikenguyen:zaszaszas123@coin-price-service.yduvks2.mongodb.net/?retryWrites=true&w=majority&appName=coin-price-service';
 // const MAX_READ_RECORDS = 300000;
 // initializeRedisClient();
 
@@ -47,6 +47,7 @@ initMongoDBClient(uri).then(async () => {
 
       const { time, value: price } = data;
 
+      console.log(data);
       updateLatestCandleByChartType('h1', time, price);
       updateLatestCandleByChartType('h4', time, price);
       updateLatestCandleByChartType('d1', time, price);
