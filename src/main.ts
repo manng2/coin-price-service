@@ -45,6 +45,7 @@ initMongoDBClient(uri).then(async () => {
     if (data) {
       console.log(`✅ Found new chart log since ${continueReadIdx - 1}`);
 
+      continueReadIdx += 1;
       const { time, value: price } = data;
 
       console.log(data);

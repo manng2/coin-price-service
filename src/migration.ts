@@ -24,7 +24,7 @@ async function getAllRecords() {
       allRecords.push(record);
     }
 
-    lastIdx += pageSize;
+    lastIdx += records.length;
   }
 
   return {
