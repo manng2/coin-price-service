@@ -1,6 +1,7 @@
 import { generateChartKey } from './generate-chart-key.util';
 import { getLastReadIdxAndData } from './get-latest-read-idx-and-data.util';
 import fs from 'fs';
+import { setDateByChartType } from './set-date-by-chart-type.util';
 
 export function updateLatestCandleByChartType(type: 'h1' | 'h4' | 'd1' | 'm1' | 'm5' | 'm15', time: number, price: number) {
   const key = generateChartKey(time, type);
@@ -13,10 +14,8 @@ export function updateLatestCandleByChartType(type: 'h1' | 'h4' | 'd1' | 'm1' | 
 
     data[data.length - 1] = [timestamp, open, String(Math.max(Number(high), price)), String(Math.min(Number(low), price)), String(price)];
   } else {
-    const date = new Date(time);
-    date.setMinutes(0);
-    date.setSeconds(0);
-    date.setMilliseconds(0);
+    let date = new Date(time);
+    date = setDateByChartType(date, type);
     const priceStr = String(price);
 
     const newData = [date.getTime(), priceStr, priceStr, priceStr, priceStr];

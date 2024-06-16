@@ -1,4 +1,4 @@
-import { generateH1ChartData, generateH4ChartData, generateD1ChartData } from "./utils";
+import { generateH1ChartData, generateH4ChartData, generateD1ChartData, generateM15ChartData, generateM1ChartData, generateM5ChartData } from "./utils";
 import { chartLogs, initMongoDBClient } from "./utils/db-client.util";
 import { getLastReadIdxAndData } from "./utils/get-latest-read-idx-and-data.util";
 import { mergeData } from "./utils/merge-data.util";
@@ -77,21 +77,21 @@ async function migration() {
 
   const m1ChartData = {
     lastReadIdx: lastIdx,
-    data: mergeData(oldDataM1, generateD1ChartData(data).data, 'm1'),
+    data: mergeData(oldDataM1, generateM1ChartData(data).data, 'm1'),
   };
 
   const { data: oldDataM5 } = getLastReadIdxAndData('m5');
 
   const m5ChartData = {
     lastReadIdx: lastIdx,
-    data: mergeData(oldDataM5, generateD1ChartData(data).data, 'm5'),
+    data: mergeData(oldDataM5, generateM5ChartData(data).data, 'm5'),
   };
 
   const { data: oldDataM15 } = getLastReadIdxAndData('m15');
 
   const m15ChartData = {
     lastReadIdx: lastIdx,
-    data: mergeData(oldDataM15, generateD1ChartData(data).data, 'm15'),
+    data: mergeData(oldDataM15, generateM15ChartData(data).data, 'm15'),
   };
 
   fs.writeFile(h1FilePath, JSON.stringify(h1ChartData), (err) => {
@@ -150,5 +150,5 @@ async function migration() {
 const uri = 'mongodb+srv://mikenguyen:zaszaszas123@coin-price-service.yduvks2.mongodb.net/?retryWrites=true&w=majority&appName=coin-price-service';
 
 initMongoDBClient(uri).then(() => {
-  migration();
+  return migration();
 });

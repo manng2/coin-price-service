@@ -1,5 +1,6 @@
 import { convertToNewFormat } from './convert-old-format-to-new-format.util';
 import { generateChartKey } from './generate-chart-key.util';
+import { setDateByChartType } from './set-date-by-chart-type.util';
 
 export function generateH1ChartData(data: any) {
   const rangeMap: Record<string, any> = {};
@@ -21,10 +22,8 @@ export function generateH1ChartData(data: any) {
         High: Math.max(rangeMap[key].High, it.value),
       };
     } else {
-      const date = new Date(it.time);
-      date.setMinutes(0);
-      date.setSeconds(0);
-      date.setMilliseconds(0);
+      let date = new Date(it.time);
+      date = setDateByChartType(date, 'h1');
 
       rangeMap[key] = {
         Close: it.value,
@@ -62,10 +61,8 @@ export function generateD1ChartData(data: any) {
         High: Math.max(rangeMap[key].High, it.value),
       };
     } else {
-      const date = new Date(it.time);
-      date.setMinutes(0);
-      date.setSeconds(0);
-      date.setMilliseconds(0);
+      let date = new Date(it.time);
+      date = setDateByChartType(date, 'd1');
 
       rangeMap[key] = {
         Close: it.value,
@@ -103,10 +100,8 @@ export function generateH4ChartData(data: any) {
         High: Math.max(rangeMap[key].High, it.value),
       };
     } else {
-      const date = new Date(it.time);
-      date.setMinutes(0);
-      date.setSeconds(0);
-      date.setMilliseconds(0);
+      let date = new Date(it.time);
+      date = setDateByChartType(date, 'h4');
 
       rangeMap[key] = {
         Close: it.value,
@@ -144,10 +139,8 @@ export function generateM1ChartData(data: any) {
         High: Math.max(rangeMap[key].High, it.value),
       };
     } else {
-      const date = new Date(it.time);
-      date.setMinutes(0);
-      date.setSeconds(0);
-      date.setMilliseconds(0);
+      let date = new Date(it.time);
+      date = setDateByChartType(date, 'm1');
 
       rangeMap[key] = {
         Close: it.value,
@@ -185,10 +178,8 @@ export function generateM5ChartData(data: any) {
         High: Math.max(rangeMap[key].High, it.value),
       };
     } else {
-      const date = new Date(it.time);
-      date.setMinutes(0);
-      date.setSeconds(0);
-      date.setMilliseconds(0);
+      let date = new Date(it.time);
+      date = setDateByChartType(date, 'm5');
 
       rangeMap[key] = {
         Close: it.value,
@@ -226,10 +217,8 @@ export function generateM15ChartData(data: any) {
         High: Math.max(rangeMap[key].High, it.value),
       };
     } else {
-      const date = new Date(it.time);
-      date.setMinutes(0);
-      date.setSeconds(0);
-      date.setMilliseconds(0);
+      let date = new Date(it.time);
+      date = setDateByChartType(date, 'm15');
 
       rangeMap[key] = {
         Close: it.value,
